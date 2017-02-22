@@ -1,0 +1,7 @@
+*.pyc
+*~
+/dist
+/build
+/.idea
+/setuptools-3.1.zip
+/setuptools-3.1-py2.7.egg
