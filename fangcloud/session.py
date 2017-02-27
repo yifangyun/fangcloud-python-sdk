@@ -28,3 +28,8 @@ def pinned_session(pool_maxsize=8):
     return _session
 
 
+def create_session(max_connections=8, proxies=None):
+    session = pinned_session(pool_maxsize=max_connections)
+    if proxies:
+        session.proxies = proxies
+    return session

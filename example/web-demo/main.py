@@ -206,6 +206,9 @@ class AuthFinishHandler(BasicHandler):
         except OAuthRedirectParamError:
             self.send_error(400, reason="On /fangcloud-auth-finish: Wrong oauth redirect url to fetch oauth in finish")
             return
+
+        # here, we need to store result.access_token, result.refresh_token and result.expires_in into self defined database in real application
+
         self.write(str(result))
 
 
