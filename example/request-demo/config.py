@@ -1,6 +1,6 @@
 
 class Config:
-    access_token = "d3e89af7-4e56-4c85-9896-e8df492590d6"
+    access_token = "6d3c722b-9631-426a-9172-e220d188c2c8"
     refresh_token = ""
 
 

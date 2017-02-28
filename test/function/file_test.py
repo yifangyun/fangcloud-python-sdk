@@ -1,5 +1,6 @@
 
-from basic import BasicTest
+
+from .basic import BasicTest
 
 
 class FileFunctionTest(BasicTest):

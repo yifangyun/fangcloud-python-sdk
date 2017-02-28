@@ -6,7 +6,7 @@
 
 方法一：通过pip命令进行安装，请确保本地正常安装有Python和pip，并在命令行中输入如下命令：
 
-> $ pip install yifangyun
+> $ pip install fangcloud
 
 方法二：通过源码安装，将源码克隆到本地，运行install命令
 
@@ -123,7 +123,28 @@ yfy_client = YfyClientFactory.get_client_instance("YOUR-USER-ID", access_token, 
 yfy_client = YfyClientFactory.get_client_instance("YOUR-USER-ID")
 ```
 
-#### 
+### 获取文件信息
+
+```python
+file_info = yfy_client.file().get_file_info(file_id)
+print('file_name: '+file_info['name'])
+```
+
+
+
+## 测试
+
+亿方云Python SDK采用[tox](https://tox.readthedocs.io/en/latest/)作为测试工具，兼容python2和python3版本，可以通过```pip install tox```命令来安装tox。要用tox来测试亿方云Python SDK，需要有OAuth Token，可以在tox命令之前加环境变量YFY_TOKEN将token传输进去：
+
+> $ YFY_TOKEN=... tox
+
+如果使用IDE，例如PyCharm，来运行tox，请在IDE中进行配置运行时环境变量
+
+
+
+## 技术支持
+
+如有任何技术疑问，请联系亿方云开放平台管理员(email：[support@yifangyun.com](support@yifangyun.com))，我们会第一时间回复。
 
 
 
