@@ -194,14 +194,14 @@ class AuthFinishHandler(BasicHandler):
             self.write(response_page)
             return
 
-        # check stats
+        # check state
         state_in_session = self.get_state()
         if state != state_in_session:
             # self.send_error(400, reason="On /fangcloud-auth-finish: Wrong state received")
             # return
             pass
         try:
-            result = self.__oauth__.finish(code, Config.redirect_url)
+            result = self.__oauth__.authenticate(code, Config.redirect_url)
         except OAuthCodeParamError:
             self.send_error(400, reason="On /fangcloud-auth-finish: Wrong oauth code to fetch oauth token in finish")
             return

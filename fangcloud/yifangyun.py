@@ -55,6 +55,10 @@ class YfyClientFactory(object):
                 assert call_back is None or (call_back is not None and isinstance(call_back, YfyNewTokenCallBack))
                 client = YfyClient(access_token, refresh_token, call_back)
                 cls._clients[key] = client
+        else:
+            client.access_token = client.access_token if access_token is None else access_token
+            client.refresh_token = client.refresh_token if refresh_token is None else refresh_token
+            client.call_back = client.call_back if call_back is None else call_back
         return client
 
 

@@ -75,7 +75,7 @@ class FangcloudOAuth2FlowBase(object):
 
         return self.build_url('/oauth/authorize', query_params)
 
-    def finish(self, code, redirect_uri):
+    def authenticate(self, code, redirect_uri):
         if code is None or redirect_uri is None:
             raise OAuthCodeParamError
 

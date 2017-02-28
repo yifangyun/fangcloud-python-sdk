@@ -1,8 +1,8 @@
-## 亿方云Python SDK
+# 亿方云Python SDK
 
 亿方云Python版本SDK，集成亿方云V1系列API，具有强大的文件管理能力。该SDK可以运行在Python2.7和Python3的各个版之上。
 
-### 安装
+## 安装
 
 方法一：通过pip命令进行安装，请确保本地正常安装有Python和pip，并在命令行中输入如下命令：
 
@@ -22,33 +22,26 @@
 
 
 
-### 创建应用
+## 创建应用
 
-
-
-
-
-### 授权流程
+## 授权流程
 
 亿方云开放平台API采用OAuth2.0协议进行授权。在SDK中提供了丰富的接口和简单的使用示例，方便开发者对接亿方云的OAuth流程。详细API说明，请参考[亿方云文档](https://open.fangcloud.com/wiki/#OAuth2)。
 
-对接的Demo位于example/web-demo中，运行其中的main.py即可启动web服务。在浏览器中输入"http://localhost:8088"进入demo流程。在使用之前请确保本地8088端口未被占用。web-demo使用tornado框架进行搭建，需在使用之前预先安装好。
+对接的Demo位于example/web-demo中，运行其中的main.py即可启动web服务。在浏览器中输入 "[http://localhost:8088](http://localhost:8088)" 进入demo流程。在使用之前请确保本地8088端口未被占用。web-demo使用tornado框架进行搭建，需在使用之前预先安装好。
 
-#### 获取授权链接
+### 获取授权链接
 
 授权的第一步是获取授权链接，示例如下代码实现：
 
 ```python
 from fangcloud.oauth import FangcloudOAuth2FlowBase
-# create a random stats, used for CSRF or remember web service current stats
-# the state can be stored in session
 state = utils.generate_new_state()
-# use SDK to fetch authorized url
 oauth = FangcloudOAuth2FlowBase("YOUR_CLIENT_ID", "YOUR_CLIENT_SECRET")
-oauth.get_authorize_url("YOUR_REDIRECT_URL", state)
-# rediret to authorized url
-redirect(authorize_url)
+authorize_url = oauth.get_authorize_url("YOUR_REDIRECT_URL", state)
 ```
+
+其中需要输入在应用申请中获得的client id，client secret以及回调url。client id和client secret都为字符串，用以唯一表示一个应用；回调url是在授权过程中，传输授权码的渠道，由第三方开发者提供web服务。
 
 web-demo中提供了实现类：
 
@@ -73,13 +66,64 @@ class AuthStartHandler(BasicHandler):
         self.redirect(authorize_url)
 ```
 
+### 获取OAuth Token / Refresh Token
 
+如果提供的回调url准确，授权流程最终会回调第三方提供的url ([http://YOUR_REDIRECT_URL?code=YOUR_AUTH_CODE](http://YOUR_REDIRECT_URL?code=YOUR_AUTH_CODE)）以完成授权码的传递。收到授权码之后，就可以利用授权码换取oauth token和refresh token。SDK中提供了简单的方法以供调用：
 
+```python
+oauth.FangcloudOAuth2FlowBase("YOUR_CLIENT_ID", "YOUR_CLIENT_SECRET")
+result = oauth.authenticate('YOUR_AUTH_CODE')
+access_token, refresh_token = result.access_token, result.refresh_token
+```
 
+web-demo中提供了实现类：
 
-### 使用方法
+```python
+class AuthFinishHandler(BasicHandler):
+
+    def get(self):
+        code = self.get_argument("code", None)
+        state = self.get_argument("state", None)
+        username = self.get_login_user()
+        user = self.__database__.get_user(username)
+        if user is None:
+            response_page = utils.build_page("Error", "Nobody is logged in.")
+            self.write(response_page)
+            return
+
+        # check state
+        state_in_session = self.get_state()
+        if state != state_in_session:
+            self.send_error(400, reason="Wrong state received")
+        try:
+            result = self.__oauth__.authenticate(code, Config.redirect_url)
+        except OAuthCodeParamError:
+            self.send_error(400, reason="Wrong oauth code to fetch oauth token")
+            return
+        except OAuthRedirectParamError:
+            self.send_error(400, reason="Wrong oauth redirect url to fetch oauth")
+            return
+        self.write(str(result))
+```
+
+## 使用方法
 
 亿方云提供开放平台V1版本的API，详细说明文档请参阅[API文档](https://open.fangcloud.com/wiki/#接口列表)。
+
+一旦获取得到OAuth Token和Refresh Tokken就可以正常调用亿方云开放平台的API，首先需要公国SDK提供的工厂类方法，获取一个亿方云的client：
+
+```python
+from fangcloud.yifangyun import YfyClientFactory
+yfy_client = YfyClientFactory.get_client_instance("YOUR-USER-ID", access_token, refresh_token)
+```
+
+该工厂方法可以复用同一个用户的token，在第一次传入的时候需要指定OAuth Token和Refresh Tokken，后续可以通过用户ID直接获取：
+
+```python
+yfy_client = YfyClientFactory.get_client_instance("YOUR-USER-ID")
+```
+
+#### 
 
 
 
