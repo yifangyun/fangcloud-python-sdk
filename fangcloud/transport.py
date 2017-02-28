@@ -47,12 +47,13 @@ class YfyTransport(object):
     _ROUTE_STYLE_UPLOAD = 'upload'
     _ROUTE_STYLE_RPC = 'rpc'
 
-    _METHOD_GET = "get"
-    _METHOD_POST = "post"
-    _METHOD_DELETE = "delete"
+    _METHOD_GET = 'get'
+    _METHOD_POST = 'post'
+    _METHOD_DELETE = 'delete'
+    _METHOD_PUT = 'put'
 
-    _RESULT_TYPE_JSON = "json"
-    _RESULT_TYPE_RAW = "raw"
+    _RESULT_TYPE_JSON = 'json'
+    _RESULT_TYPE_RAW = 'raw'
 
     _session = create_session()
 
@@ -93,6 +94,10 @@ class YfyTransport(object):
         kwargs.setdefault('route_style', self._ROUTE_STYLE_RPC)
         return self.request_with_retry(self._METHOD_DELETE, url, **kwargs)
 
+    def put(self, url, **kwargs):
+        kwargs.setdefault('route_style', self._ROUTE_STYLE_RPC)
+        return self.request_with_retry(self._METHOD_PUT, url, **kwargs)
+
     def request_with_retry(self,
                            method,
                            url,
@@ -107,11 +112,12 @@ class YfyTransport(object):
             self._logger.info('Requests to url = %s', url)
             try:
                 result = self.send_request(method,
-                                         url,
-                                         params,
-                                         route_style,
-                                         request_json_arg,
-                                         timeout)
+                                           url,
+                                           params,
+                                           route_style,
+                                           request_json_arg,
+                                           timeout
+                                           )
                 if isinstance(result, Response):
                     if result_type == self._RESULT_TYPE_JSON:
                         return json.loads(result.raw)
@@ -162,7 +168,7 @@ class YfyTransport(object):
         stream = False
         if route_style == self._ROUTE_STYLE_RPC:
             if self._API_VERSION == "V1":
-                headers['Content-Type'] = 'application/v1+json'
+                headers['Content-Type'] = 'application/json'
             else:
                 headers['Content-Type'] = 'application/json'
             body = request_json_arg
@@ -180,29 +186,37 @@ class YfyTransport(object):
             r = self._session.get(url,
                                   headers=headers,
                                   params=params,
-                                  data=body,
                                   stream=stream,
                                   verify=True,
-                                  timeout=timeout,
+                                  timeout=timeout
                                   )
         elif method == self._METHOD_POST:
             r = self._session.post(url,
                                    headers=headers,
                                    params=params,
-                                   data=body,
+                                   json=body,
                                    stream=stream,
                                    verify=True,
-                                   timeout=timeout,
+                                   timeout=timeout
                                    )
         elif method == self._METHOD_DELETE:
             r = self._session.delete(url,
                                      headers=headers,
                                      params=params,
-                                     data=body,
+                                     json=body,
                                      stream=stream,
                                      verify=True,
-                                     timeout=timeout,
+                                     timeout=timeout
                                     )
+        elif method == self._METHOD_PUT:
+            r = self._session.put(url,
+                                  headers=headers,
+                                  params=params,
+                                  json=body,
+                                  stream=stream,
+                                  verify=True,
+                                  timeout=timeout
+                                 )
         else:
             raise ValueError('Unknown method: %r' % method)
 
@@ -225,8 +239,7 @@ class YfyTransport(object):
             elif r.status_code == 400:
                 raise BadInputError(request_id, r.status_code, r.text)
             elif r.status_code == 401:
-                err = None
-                raise AuthError(request_id, err)
+                raise AuthError(request_id)
             elif r.status_code == 429:
                 err = None
                 retry_after = r.headers.get('X-Rate-Limit-Reset')

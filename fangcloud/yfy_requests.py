@@ -13,6 +13,13 @@ class FileRequests(YfyTransport):
         url = UrlBuilder.get_file_info(file_id)
         return self.get(url)
 
+    def update_file_info(self, file_id, file_name):
+        url = UrlBuilder.update_file_info(file_id)
+        pay_load = {
+            "name": file_name
+        }
+        return self.put(url, request_json_arg=pay_load)
+
 
 class FolderRequests(YfyTransport):
 

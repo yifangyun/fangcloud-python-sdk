@@ -75,12 +75,11 @@ class BadInputError(YfyAPIException):
 class AuthError(YfyAPIException):
     """Errors due to invalid authentication credentials."""
 
-    def __init__(self, request_id, error):
+    def __init__(self, request_id):
         super(AuthError, self).__init__(request_id, 401, None)
-        self.error = error
 
     def __repr__(self):
-        return 'AuthError(request_id = %s, error = %s)'.format(self.request_id, self.error)
+        return 'AuthError(request_id = {!r})'.format(self.request_id)
 
 
 class RateLimitError(YfyAPIException):
@@ -92,6 +91,6 @@ class RateLimitError(YfyAPIException):
         self.back_off = back_off
 
     def __repr__(self):
-        return 'RateLimitError (request_id = %s, error = %s)'.format(self.request_id, self.error)
+        return 'RateLimitError (request_id = {!r}, error = {!r})'.format(self.request_id, self.error)
 
 
