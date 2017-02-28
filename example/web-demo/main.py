@@ -164,6 +164,7 @@ class AuthStartHandler(BasicHandler):
         username = self.get_login_user()
         user = self.__database__.get_user(username)
 
+        # check user login
         if user is None:
             response_page = utils.build_page("Error", "This page requires a logged-in user.  Nobody is logged in.")
             self.write(response_page)
@@ -171,8 +172,9 @@ class AuthStartHandler(BasicHandler):
 
         # create a random stats, used for CSRF or remember web service current stats
         state = utils.generate_new_state()
+        # the state can be stored in session
         self.set_state(state)
-        # use SDK to handle auth process
+        # use SDK to fetch authorized url
         authorize_url = self.__oauth__.get_authorize_url(Config.redirect_url, state)
         self.redirect(authorize_url)
 
