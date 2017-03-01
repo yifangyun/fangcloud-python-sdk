@@ -1,10 +1,12 @@
 import json
 import logging
+import os
 import random
 import time
 
 import requests
 import six
+from requests_toolbelt import MultipartEncoderMonitor
 
 from fangcloud.exceptions import InternalServerError, RateLimitError, BadInputError, AuthError, YfyAPIException
 from fangcloud.session import create_session
@@ -98,6 +100,10 @@ class YfyTransport(object):
         kwargs.setdefault('route_style', self._ROUTE_STYLE_RPC)
         return self.request_with_retry(self._METHOD_PUT, url, **kwargs)
 
+    def post_file(self, url, **kwargs):
+        kwargs.setdefault('route_style', self._ROUTE_STYLE_UPLOAD)
+        return self.request_with_retry(self._METHOD_POST, url, **kwargs)
+
     def request_with_retry(self,
                            method,
                            url,
@@ -105,6 +111,7 @@ class YfyTransport(object):
                            route_style=None,
                            request_json_arg=None,
                            result_type=_RESULT_TYPE_JSON,
+                           upload_file_path=None,
                            timeout=None):
         attempt = 0
         rate_limit_errors = 0
@@ -116,6 +123,7 @@ class YfyTransport(object):
                                            params,
                                            route_style,
                                            request_json_arg,
+                                           upload_file_path,
                                            timeout
                                            )
                 if isinstance(result, Response):
@@ -154,6 +162,7 @@ class YfyTransport(object):
                      params,
                      route_style,
                      request_json_arg,
+                     upload_file_path,
                      timeout):
         headers = {
             'Authorization': 'Bearer %s' % self._oauth2_access_token
@@ -162,6 +171,9 @@ class YfyTransport(object):
             headers = {'User-Agent': self._user_agent}
         if self._headers:
             headers.update(self._headers)
+
+        if timeout is None:
+            timeout = self._timeout
 
         # The contents of the body of the HTTP request
         body = None
@@ -172,53 +184,60 @@ class YfyTransport(object):
             else:
                 headers['Content-Type'] = 'application/json'
             body = request_json_arg
+            if method == self._METHOD_GET:
+                r = self._session.get(url,
+                                      headers=headers,
+                                      params=params,
+                                      stream=stream,
+                                      verify=True,
+                                      timeout=timeout
+                                      )
+            elif method == self._METHOD_POST:
+                r = self._session.post(url,
+                                       headers=headers,
+                                       params=params,
+                                       json=body,
+                                       stream=stream,
+                                       verify=True,
+                                       timeout=timeout
+                                       )
+            elif method == self._METHOD_DELETE:
+                r = self._session.delete(url,
+                                         headers=headers,
+                                         params=params,
+                                         json=body,
+                                         stream=stream,
+                                         verify=True,
+                                         timeout=timeout
+                                        )
+            elif method == self._METHOD_PUT:
+                r = self._session.put(url,
+                                      headers=headers,
+                                      params=params,
+                                      json=body,
+                                      stream=stream,
+                                      verify=True,
+                                      timeout=timeout
+                                     )
+            else:
+                raise ValueError('Unknown method: %r' % method)
         elif route_style == self._ROUTE_STYLE_DOWNLOAD:
             stream = True
         elif route_style == self._ROUTE_STYLE_UPLOAD:
-            headers['Content-Type'] = 'application/octet-stream'
-        else:
-            raise ValueError('Unknown operation style: %r' % route_style)
-
-        if timeout is None:
-            timeout = self._timeout
-
-        if method == self._METHOD_GET:
-            r = self._session.get(url,
-                                  headers=headers,
-                                  params=params,
-                                  stream=stream,
-                                  verify=True,
-                                  timeout=timeout
-                                  )
-        elif method == self._METHOD_POST:
+            file_handler = open(upload_file_path, 'rb')
+            files = {'file': ("yifangyun-file", file_handler, {'Expires': '0'})}
+            multipart_monitor = MultipartEncoderMonitor.from_fields(fields=files)
+            headers['Content-Type'] = multipart_monitor.content_type
             r = self._session.post(url,
                                    headers=headers,
                                    params=params,
-                                   json=body,
+                                   data=multipart_monitor,
                                    stream=stream,
                                    verify=True,
                                    timeout=timeout
                                    )
-        elif method == self._METHOD_DELETE:
-            r = self._session.delete(url,
-                                     headers=headers,
-                                     params=params,
-                                     json=body,
-                                     stream=stream,
-                                     verify=True,
-                                     timeout=timeout
-                                    )
-        elif method == self._METHOD_PUT:
-            r = self._session.put(url,
-                                  headers=headers,
-                                  params=params,
-                                  json=body,
-                                  stream=stream,
-                                  verify=True,
-                                  timeout=timeout
-                                 )
         else:
-            raise ValueError('Unknown method: %r' % method)
+            raise ValueError('Unknown operation style: %r' % route_style)
 
         if 200 <= r.status_code <= 299:
             if route_style == self._ROUTE_STYLE_DOWNLOAD:
@@ -249,3 +268,5 @@ class YfyTransport(object):
                 return ErrorResponse(request_id, r.status_code, raw_resp)
             else:
                 raise YfyAPIException(request_id, r.status_code, r.text)
+
+

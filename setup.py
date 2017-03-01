@@ -23,7 +23,7 @@ install_requires = [
     'urllib3',
     'requests>=2.5.1,!=2.6.1',
     'six>=1.3.0',
-    'typing>=3.5.2'
+    'requests_toolbelt>=0.7.0'
 ]
 
 tests_require = [

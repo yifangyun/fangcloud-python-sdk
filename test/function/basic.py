@@ -15,6 +15,7 @@ class BasicTest(unittest.TestCase):
     def setUp(self):
         self.yfy_client = YfyClientFactory.get_client_instance("user-id", access_token)
 
-
+    def tearDown(self):
+        pass
 
 
