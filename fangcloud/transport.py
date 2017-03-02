@@ -67,7 +67,26 @@ class YfyTransport(object):
                  user_agent=None,
                  session=None,
                  headers=None,
+                 proxy=None,
                  timeout=_DEFAULT_TIMEOUT):
+        """
+        :param str oauth2_access_token: OAuth2 access token for making client requests.
+        :param str oauth2_refresh_token: OAuth2 refresh token for refresh oauth2 token
+        :param Optional[int] max_retries_on_error: On 5xx errors, the number of times to retry.
+        :param Optional[int] max_retries_on_rate_limit: On 429 errors, the number of times to retry. If `None`, always retries.
+        :param str user_agent: The user agent to use when making requests. This helps us identify requests coming from your application.
+        :param session: If not provided, a new session (connection pool) is created. To share a session across multiple clients, use
+            :func:`create_session`.
+        :param dict headers: Additional headers to add to requests.
+        :param dict proxy: Only http and https supported, json example.
+            {
+                'http': 'http://%s:%s@%s:%d' % (user_name, password, ip_address, port),
+                'https': 'https://%s:%s@%s:%d' % (user_name, password, ip_address, port)
+            }
+        :param Optional[float] timeout: timeout: Maximum duration in seconds that client will wait for any single packet from the
+            server. After the timeout the client will give up on connection. If `None`, client will wait forever. Defaults
+            to 30 seconds.
+        """
         assert len(oauth2_access_token) > 0, 'OAuth2 access token cannot be empty.'
         assert headers is None or isinstance(headers, dict), 'Expected dict, got %r' % headers
         self._oauth2_access_token = oauth2_access_token
@@ -77,6 +96,7 @@ class YfyTransport(object):
         self._user_agent = user_agent
         self._headers = headers
         self._timeout = timeout
+        self._proxy = proxy
         self._logger = logging.getLogger('yifangyun')
 
         if session:
@@ -112,6 +132,7 @@ class YfyTransport(object):
                            request_json_arg=None,
                            result_type=_RESULT_TYPE_JSON,
                            upload_file_path=None,
+                           proxy=None,
                            timeout=None):
         attempt = 0
         rate_limit_errors = 0
@@ -124,6 +145,7 @@ class YfyTransport(object):
                                            route_style,
                                            request_json_arg,
                                            upload_file_path,
+                                           proxy,
                                            timeout
                                            )
                 if isinstance(result, Response):
@@ -163,6 +185,7 @@ class YfyTransport(object):
                      route_style,
                      request_json_arg,
                      upload_file_path,
+                     proxy,
                      timeout):
         headers = {
             'Authorization': 'Bearer %s' % self._oauth2_access_token
@@ -174,6 +197,9 @@ class YfyTransport(object):
 
         if timeout is None:
             timeout = self._timeout
+
+        if proxy is None:
+            proxy = self._proxy
 
         # The contents of the body of the HTTP request
         body = None
@@ -190,6 +216,7 @@ class YfyTransport(object):
                                       params=params,
                                       stream=stream,
                                       verify=True,
+                                      proxy=None,
                                       timeout=timeout
                                       )
             elif method == self._METHOD_POST:
@@ -199,6 +226,7 @@ class YfyTransport(object):
                                        json=body,
                                        stream=stream,
                                        verify=True,
+                                       proxy=None,
                                        timeout=timeout
                                        )
             elif method == self._METHOD_DELETE:
@@ -208,6 +236,7 @@ class YfyTransport(object):
                                          json=body,
                                          stream=stream,
                                          verify=True,
+                                         proxy=None,
                                          timeout=timeout
                                         )
             elif method == self._METHOD_PUT:
@@ -217,6 +246,7 @@ class YfyTransport(object):
                                       json=body,
                                       stream=stream,
                                       verify=True,
+                                      proxy=None,
                                       timeout=timeout
                                      )
             else:
@@ -234,6 +264,7 @@ class YfyTransport(object):
                                    data=multipart_monitor,
                                    stream=stream,
                                    verify=True,
+                                   proxy=None,
                                    timeout=timeout
                                    )
         else:

@@ -18,7 +18,7 @@
 
 通过以上两种方法安装完成之后，通过python脚本检测是否成功安装。
 
-> import yifangyun
+> import fangcloud
 
 
 
@@ -47,7 +47,7 @@ web-demo中提供了实现类：
 
 ```python
 class AuthStartHandler(BasicHandler):
-    
+
     def post(self, *args, **kwargs):
         username = self.get_login_user()
         user = self.__database__.get_user(username)
@@ -145,6 +145,4 @@ print('file_name: '+file_info['name'])
 ## 技术支持
 
 如有任何技术疑问，请联系亿方云开放平台管理员(email：[support@yifangyun.com](support@yifangyun.com))，我们会第一时间回复。
-
-
 
