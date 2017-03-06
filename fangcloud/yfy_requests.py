@@ -39,6 +39,7 @@ class FileRequests(YfyTransport):
         pre_sign_download_url = UrlBuilder.download_file(file_id)
         result = self.get(pre_sign_download_url)
         download_url = result["download_urls"][str(file_id)]
+        return
 
     def delete_file(self, file_id):
         assert isinstance(file_id, int)

@@ -10,9 +10,9 @@
 
 方法二：通过源码安装，将源码克隆到本地，运行install命令
 
-> $ git clone
+> $ git clone {git-url}
 >
-> $ cd path
+> $ cd {clone-path}
 >
 > $ python setup.py install
 
@@ -36,12 +36,14 @@
 
 ```python
 from fangcloud.oauth import FangcloudOAuth2FlowBase
+from fangcloud.yifangyun import YfyInit
+YfyInit.init_yifangyun("YOUR_CLIENT_ID", "YOUR_CLIENT_SECRET")
 state = utils.generate_new_state()
-oauth = FangcloudOAuth2FlowBase("YOUR_CLIENT_ID", "YOUR_CLIENT_SECRET")
+oauth = FangcloudOAuth2FlowBase()
 authorize_url = oauth.get_authorize_url("YOUR_REDIRECT_URL", state)
 ```
 
-其中需要输入在应用申请中获得的client id，client secret以及回调url。client id和client secret都为字符串，用以唯一表示一个应用；回调url是在授权过程中，传输授权码的渠道，由第三方开发者提供web服务。
+其中需要输入在应用申请中获得的client id，client secret以及回调url。client id和client secret都为字符串，用以唯一表示一个应用；回调url是在授权过程中，传输授权码的渠道，由第三方开发者提供web服务。需要注意的是，在使用亿方云SDK之前，必须先调用YfyInit.init_yifangyun做初始化。
 
 web-demo中提供了实现类：
 
@@ -71,7 +73,7 @@ class AuthStartHandler(BasicHandler):
 如果提供的回调url准确，授权流程最终会回调第三方提供的url ([http://YOUR_REDIRECT_URL?code=YOUR_AUTH_CODE](http://YOUR_REDIRECT_URL?code=YOUR_AUTH_CODE)）以完成授权码的传递。收到授权码之后，就可以利用授权码换取oauth token和refresh token。SDK中提供了简单的方法以供调用：
 
 ```python
-oauth.FangcloudOAuth2FlowBase("YOUR_CLIENT_ID", "YOUR_CLIENT_SECRET")
+oauth.FangcloudOAuth2FlowBase()
 result = oauth.authenticate('YOUR_AUTH_CODE')
 access_token, refresh_token = result.access_token, result.refresh_token
 ```
@@ -110,10 +112,11 @@ class AuthFinishHandler(BasicHandler):
 
 亿方云提供开放平台V1版本的API，详细说明文档请参阅[API文档](https://open.fangcloud.com/wiki/#接口列表)。
 
-一旦获取得到OAuth Token和Refresh Tokken就可以正常调用亿方云开放平台的API，首先需要公国SDK提供的工厂类方法，获取一个亿方云的client：
+一旦获取得到OAuth Token和Refresh Tokken就可以正常调用亿方云开放平台的API，首先需要公国SDK提供的工厂类方法，获取一个亿方云的client。同样，不要忘记先做init_yifangyun初始化。
 
 ```python
 from fangcloud.yifangyun import YfyClientFactory
+YfyInit.init_yifangyun("YOUR_CLIENT_ID", "YOUR_CLIENT_SECRET")
 yfy_client = YfyClientFactory.get_client_instance("YOUR-USER-ID", access_token, refresh_token)
 ```
 
@@ -145,4 +148,3 @@ print('file_name: '+file_info['name'])
 ## 技术支持
 
 如有任何技术疑问，请联系亿方云开放平台管理员(email：[support@yifangyun.com](support@yifangyun.com))，我们会第一时间回复。
-

@@ -2,6 +2,7 @@ import threading
 
 from abc import ABCMeta, abstractmethod
 
+from fangcloud.system_info import YfySystemInfo
 from fangcloud.yfy_requests import FileRequests, FolderRequests, UserRequests
 
 
@@ -62,6 +63,11 @@ class YfyClientFactory(object):
         return client
 
 
+class YfyInit(object):
+
+    @staticmethod
+    def init_yifangyun(client_id, client_secret):
+        YfySystemInfo.set_client(client_id, client_secret)
 
 
 

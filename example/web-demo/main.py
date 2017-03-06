@@ -7,8 +7,12 @@ import utils
 from config import Config
 from fangcloud.exceptions import OAuthCodeParamError, OAuthRedirectParamError
 from fangcloud.oauth import FangcloudOAuth2FlowBase
+from fangcloud.yifangyun import YfyInit
 from user_database import UserDatabase
 from session import MemorySession
+
+
+YfyInit.init_yifangyun(Config.client_id, Config.client_secret)
 
 
 class SessionHandler(tornado.web.RequestHandler):
@@ -29,11 +33,11 @@ class SessionHandler(tornado.web.RequestHandler):
         self.session_obj.__delitem__(obj_key)
 
 
-class BasicHandler(SessionHandler, ):
+class BasicHandler(SessionHandler):
 
     __lock__ = threading.Lock()
     __database__ = UserDatabase("user.db")
-    __oauth__ = FangcloudOAuth2FlowBase(Config.client_id, Config.client_secret)
+    __oauth__ = FangcloudOAuth2FlowBase()
 
     def get_login_user(self):
         return self.get_session_obj("login_user")

@@ -7,6 +7,7 @@ from requests.auth import HTTPBasicAuth
 
 from fangcloud.exceptions import OAuthCodeParamError, OAuthRedirectParamError
 from fangcloud.session import pinned_session
+from fangcloud.system_info import YfySystemInfo
 
 if six.PY3:
     url_path_quote = urllib.parse.quote
@@ -55,9 +56,11 @@ class OAuth2FlowNoRedirectResult(object):
 
 class FangcloudOAuth2FlowBase(object):
 
-    def __init__(self, client_id, client_secret, locale=None):
-        self.client_id = client_id
-        self.client_secret = client_secret
+    def __init__(self, locale=None):
+        assert YfySystemInfo.get_client_id() is not None
+        assert YfySystemInfo.get_client_secret() is not None
+        self.client_id = YfySystemInfo.get_client_id()
+        self.client_secret = YfySystemInfo.get_client_secret()
         self.locale = locale
         self.requests_session = pinned_session()
         self._host = os.environ.get('FANGCLOUD_WEB_HOST', 'oauth.fangcloud.net')
@@ -83,10 +86,11 @@ class FangcloudOAuth2FlowBase(object):
             raise OAuthRedirectParamError
 
         url = self.build_url('/oauth/token')
-        params = {'grant_type': 'authorization_code',
-                  'code': code,
-                  'client_id': self.client_id,
-                  'client_secret': self.client_secret,
+        params = {
+                    'grant_type': 'authorization_code',
+                    'code': code,
+                    'client_id': self.client_id,
+                    'client_secret': self.client_secret,
                   }
         if self.locale is not None:
             params['locale'] = self.locale

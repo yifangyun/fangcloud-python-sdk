@@ -10,6 +10,7 @@ from requests_toolbelt import MultipartEncoderMonitor
 
 from fangcloud.exceptions import InternalServerError, RateLimitError, BadInputError, AuthError, YfyAPIException
 from fangcloud.session import create_session
+from fangcloud.system_info import YfySystemInfo
 
 
 class Response(object):
@@ -62,7 +63,6 @@ class YfyTransport(object):
                  oauth2_refresh_token,
                  max_retries_on_error=2,
                  max_retries_on_rate_limit=None,
-                 user_agent=None,
                  session=None,
                  headers=None,
                  proxy=None,
@@ -72,7 +72,6 @@ class YfyTransport(object):
         :param str oauth2_refresh_token: OAuth2 refresh token for refresh oauth2 token
         :param Optional[int] max_retries_on_error: On 5xx errors, the number of times to retry.
         :param Optional[int] max_retries_on_rate_limit: On 429 errors, the number of times to retry. If `None`, always retries.
-        :param str user_agent: The user agent to use when making requests. This helps us identify requests coming from your application.
         :param session: If not provided, a new session (connection pool) is created. To share a session across multiple clients, use
             :func:`create_session`.
         :param dict headers: Additional headers to add to requests.
@@ -91,7 +90,7 @@ class YfyTransport(object):
         self._oauth2_refresh_token = oauth2_refresh_token
         self._max_retries_on_error = max_retries_on_error
         self._max_retries_on_rate_limit = max_retries_on_rate_limit
-        self._user_agent = user_agent
+        self._user_agent = ''.join([YfySystemInfo.client_id, ' ', 'OfficialFangcloudPythonSDK', '/', YfySystemInfo.sdk_version])
         self._headers = headers
         self._timeout = timeout
         self._proxy = proxy
@@ -112,6 +111,10 @@ class YfyTransport(object):
 
     def post_file(self, url, **kwargs):
         kwargs.setdefault('route_style', self._ROUTE_STYLE_UPLOAD)
+        return self.request_with_retry(self._METHOD_POST, url, **kwargs)
+
+    def download_file(self, url, **kwargs):
+        kwargs.setdefault('route_style', self._ROUTE_STYLE_DOWNLOAD)
         return self.request_with_retry(self._METHOD_POST, url, **kwargs)
 
     def request_with_retry(self,
@@ -181,7 +184,8 @@ class YfyTransport(object):
             'Authorization': 'Bearer %s' % self._oauth2_access_token
         }
         if self._user_agent is not None:
-            headers = {'User-Agent': self._user_agent}
+            headers.update({'User-Agent': self._user_agent})
+
         if self._headers:
             headers.update(self._headers)
 
@@ -209,7 +213,7 @@ class YfyTransport(object):
                                       params=params,
                                       stream=stream,
                                       verify=True,
-                                      proxies=None,
+                                      proxies=proxy,
                                       timeout=timeout
                                       )
             elif method == self._METHOD_POST:
@@ -219,13 +223,14 @@ class YfyTransport(object):
                                        json=body,
                                        stream=stream,
                                        verify=True,
-                                       proxies=None,
+                                       proxies=proxy,
                                        timeout=timeout
                                        )
             else:
                 raise ValueError('Unknown method: %r' % method)
         elif route_style == self._ROUTE_STYLE_DOWNLOAD:
             stream = True
+
         elif route_style == self._ROUTE_STYLE_UPLOAD:
             file_handler = open(upload_file_path, 'rb')
             files = {'file': ("yifangyun-file", file_handler, {'Expires': '0'})}
@@ -237,7 +242,7 @@ class YfyTransport(object):
                                    data=multipart_monitor,
                                    stream=stream,
                                    verify=True,
-                                   proxies=None,
+                                   proxies=proxy,
                                    timeout=timeout
                                    )
         else:

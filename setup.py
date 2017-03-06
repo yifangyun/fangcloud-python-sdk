@@ -38,7 +38,7 @@ setup_requires = [
 
 setup(
         name='fangcloud',
-        version='1.0',
+        version='0.0.1',
         description='Official YiFangYun API Client',
         author='YiFangYun',
         author_email='support@yifangyun.com',
