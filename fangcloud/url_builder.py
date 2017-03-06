@@ -1,7 +1,14 @@
+import os
+
 
 class UrlBuilder(object):
 
     _HOST = "https://platform.fangcloud.net"
+    # _HOST = "https://platform-dev.fangcloud.net"
+
+    @classmethod
+    def set_host(cls, value):
+        cls._HOST = value
 
     @classmethod
     def get_file_info(cls, file_id):
@@ -16,8 +23,12 @@ class UrlBuilder(object):
         return ''.join([cls._HOST, '/api', '/file/upload'])
 
     @classmethod
-    def delete_file(cls):
-        return ''.join([cls._HOST, '/api', '/file/delete'])
+    def delete_file(cls, file_id):
+        return ''.join([cls._HOST, '/api', '/file/%d/delete' % file_id])
+
+    @classmethod
+    def delete_file_batch(cls):
+        return ''.join([cls._HOST, '/api', '/file/delete_batch'])
 
     @classmethod
     def restore_file_from_trash(cls):
@@ -27,8 +38,9 @@ class UrlBuilder(object):
     def download_file(cls, file_id):
         return ''.join([cls._HOST, '/api', '/file/%d/download' % file_id])
 
-
-
+host = os.environ.get('YFY_HOST')
+if host is not None:
+    UrlBuilder.set_host(host)
 
 
 

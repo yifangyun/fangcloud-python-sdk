@@ -40,7 +40,7 @@ class ErrorResponse(object):
 
 class YfyTransport(object):
 
-    _API_VERSION = "V1"
+    _API_VERSION = "V2"
 
     # This is the default longest time we'll block on receiving data from the server
     _DEFAULT_TIMEOUT = 30
@@ -51,8 +51,6 @@ class YfyTransport(object):
 
     _METHOD_GET = 'get'
     _METHOD_POST = 'post'
-    _METHOD_DELETE = 'delete'
-    _METHOD_PUT = 'put'
 
     _RESULT_TYPE_JSON = 'json'
     _RESULT_TYPE_RAW = 'raw'
@@ -111,14 +109,6 @@ class YfyTransport(object):
     def post(self, url, **kwargs):
         kwargs.setdefault('route_style', self._ROUTE_STYLE_RPC)
         return self.request_with_retry(self._METHOD_POST, url, **kwargs)
-
-    def delete(self, url, **kwargs):
-        kwargs.setdefault('route_style', self._ROUTE_STYLE_RPC)
-        return self.request_with_retry(self._METHOD_DELETE, url, **kwargs)
-
-    def put(self, url, **kwargs):
-        kwargs.setdefault('route_style', self._ROUTE_STYLE_RPC)
-        return self.request_with_retry(self._METHOD_PUT, url, **kwargs)
 
     def post_file(self, url, **kwargs):
         kwargs.setdefault('route_style', self._ROUTE_STYLE_UPLOAD)
@@ -205,10 +195,13 @@ class YfyTransport(object):
         body = None
         stream = False
         if route_style == self._ROUTE_STYLE_RPC:
+            headers['Content-Type'] = 'application/json'
             if self._API_VERSION == "V1":
-                headers['Content-Type'] = 'application/json'
+                headers['Accept'] = 'application/v1+json'
+            elif self._API_VERSION == "V2":
+                headers['Accept'] = 'application/v2+json'
             else:
-                headers['Content-Type'] = 'application/json'
+                headers['Accept'] = 'application/json'
             body = request_json_arg
             if method == self._METHOD_GET:
                 r = self._session.get(url,
@@ -216,7 +209,7 @@ class YfyTransport(object):
                                       params=params,
                                       stream=stream,
                                       verify=True,
-                                      proxy=None,
+                                      proxies=None,
                                       timeout=timeout
                                       )
             elif method == self._METHOD_POST:
@@ -226,29 +219,9 @@ class YfyTransport(object):
                                        json=body,
                                        stream=stream,
                                        verify=True,
-                                       proxy=None,
+                                       proxies=None,
                                        timeout=timeout
                                        )
-            elif method == self._METHOD_DELETE:
-                r = self._session.delete(url,
-                                         headers=headers,
-                                         params=params,
-                                         json=body,
-                                         stream=stream,
-                                         verify=True,
-                                         proxy=None,
-                                         timeout=timeout
-                                        )
-            elif method == self._METHOD_PUT:
-                r = self._session.put(url,
-                                      headers=headers,
-                                      params=params,
-                                      json=body,
-                                      stream=stream,
-                                      verify=True,
-                                      proxy=None,
-                                      timeout=timeout
-                                     )
             else:
                 raise ValueError('Unknown method: %r' % method)
         elif route_style == self._ROUTE_STYLE_DOWNLOAD:
@@ -264,7 +237,7 @@ class YfyTransport(object):
                                    data=multipart_monitor,
                                    stream=stream,
                                    verify=True,
-                                   proxy=None,
+                                   proxies=None,
                                    timeout=timeout
                                    )
         else:

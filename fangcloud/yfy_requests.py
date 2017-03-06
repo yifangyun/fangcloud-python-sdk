@@ -21,7 +21,7 @@ class FileRequests(YfyTransport):
         pay_load = {
             "name": file_name
         }
-        return self.put(url, request_json_arg=pay_load)
+        return self.post(url, request_json_arg=pay_load)
 
     def upload_new_file(self, file_path, parent_id):
         _, name = os.path.split(file_path)
@@ -40,13 +40,18 @@ class FileRequests(YfyTransport):
         result = self.get(pre_sign_download_url)
         download_url = result["download_urls"][str(file_id)]
 
-    def delete_files(self, file_ids):
+    def delete_file(self, file_id):
+        assert isinstance(file_id, int)
+        url = UrlBuilder.delete_file(file_id)
+        return self.post(url)
+
+    def delete_file_batch(self, file_ids):
         assert isinstance(file_ids, list) or isinstance(file_ids, tuple)
-        url = UrlBuilder.delete_file()
+        url = UrlBuilder.delete_file_batch()
         pay_load = {
             "file_ids": file_ids
         }
-        return self.delete(url, request_json_arg=pay_load)
+        return self.post(url, request_json_arg=pay_load)
 
     def restore_from_trash(self, file_ids):
         assert isinstance(file_ids, list) or isinstance(file_ids, tuple)
