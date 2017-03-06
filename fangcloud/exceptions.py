@@ -72,6 +72,16 @@ class BadInputError(YfyAPIException):
         return 'BadInputError({!r}, {!r})'.format(self.request_id, self.message)
 
 
+class DownloadError(YfyAPIException):
+
+    def __init__(self, status_code, message):
+        super(DownloadError, self).__init__("", status_code, message)
+        self.message = message
+
+    def __repr__(self):
+        return 'DownloadError({!r}, {}, {!r})'.format(self.request_id, self.status_code, self.message)
+
+
 class AuthError(YfyAPIException):
     """Errors due to invalid authentication credentials."""
 

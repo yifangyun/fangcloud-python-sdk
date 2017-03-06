@@ -19,7 +19,7 @@ if client_secret is None:
     print('Set YFY_CLIENT_SECRET environment is not variable.')
     sys.exit(1)
 
-YfyInit.init_yifangyun(client_id, client_secret)
+YfyInit.init_system(client_id, client_secret)
 
 
 class BasicTest(unittest.TestCase):

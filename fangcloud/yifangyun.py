@@ -66,7 +66,7 @@ class YfyClientFactory(object):
 class YfyInit(object):
 
     @staticmethod
-    def init_yifangyun(client_id, client_secret):
+    def init_system(client_id, client_secret):
         YfySystemInfo.set_client(client_id, client_secret)
 
 

@@ -15,11 +15,12 @@ class FileRequests(YfyTransport):
         url = UrlBuilder.get_file_info(file_id)
         return self.get(url)
 
-    def update_info(self, file_id, file_name):
+    def update_info(self, file_id, file_name, description = None):
         assert isinstance(file_id, int)
         url = UrlBuilder.update_file_info(file_id)
         pay_load = {
-            "name": file_name
+            "name": file_name,
+            "description": None
         }
         return self.post(url, request_json_arg=pay_load)
 
@@ -36,10 +37,13 @@ class FileRequests(YfyTransport):
         return self.post_file(upload_url, upload_file_path=file_path)
 
     def download_file(self, file_id, file_path):
+        download_url = self.get_download_url(file_id)
+        return self.get_file(download_url, file_path)
+
+    def get_download_url(self, file_id):
         pre_sign_download_url = UrlBuilder.download_file(file_id)
         result = self.get(pre_sign_download_url)
-        download_url = result["download_urls"][str(file_id)]
-        return
+        return result["download_urls"][str(file_id)]
 
     def delete_file(self, file_id):
         assert isinstance(file_id, int)

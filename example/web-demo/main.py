@@ -12,7 +12,7 @@ from user_database import UserDatabase
 from session import MemorySession
 
 
-YfyInit.init_yifangyun(Config.client_id, Config.client_secret)
+YfyInit.init_system(Config.client_id, Config.client_secret)
 
 
 class SessionHandler(tornado.web.RequestHandler):

@@ -2,7 +2,7 @@
 from config import Config
 from fangcloud.yifangyun import YfyClientFactory, YfyInit
 
-YfyInit.init_yifangyun(Config.client_id, Config.client_secret)
+YfyInit.init_system(Config.client_id, Config.client_secret)
 
 
 class FileHandler(object):

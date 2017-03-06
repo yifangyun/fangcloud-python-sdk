@@ -1,5 +1,9 @@
+import os
 
 from .basic import BasicTest
+
+download_file_path = "unittest_download_file"
+rename_file_path = "renamed_by_unittest"
 
 
 class FileBasic(BasicTest):
@@ -41,8 +45,11 @@ class FileBasic(BasicTest):
         self.assertIn("id", result["owned_by"])
 
     def tearDown(self):
+        global download_file_path
         result = self.yfy_client.file().delete_file(self.file_id)
         self.assertIsInstance(result, dict)
+        if os.path.exists(download_file_path):
+            os.remove(download_file_path)
 
 
 class FileFunctionTest(FileBasic):
@@ -52,12 +59,19 @@ class FileFunctionTest(FileBasic):
         self.check_file_response(result)
 
     def test_update_file_info(self):
-        result = self.yfy_client.file().update_info(self.file_id, "renamed_by_test1")
+        global rename_file_path
+        result = self.yfy_client.file().update_info(self.file_id, rename_file_path)
         self.check_file_response(result)
 
     def test_download_file(self):
-        pass
+        global download_file_path
+        result = self.yfy_client.file().download_file(self.file_id, download_file_path)
+        self.assertEqual(result, True)
+        self.assertEqual(os.path.exists(download_file_path), True)
 
-
+    def test_get_download_url(self):
+        result = self.yfy_client.file().get_download_url(self.file_id)
+        self.assertIsInstance(result, str)
+        self.assertEqual(result.startswith("http"), True)  # url starts with http or https
 
 

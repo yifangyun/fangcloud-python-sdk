@@ -8,7 +8,7 @@ import requests
 import six
 from requests_toolbelt import MultipartEncoderMonitor
 
-from fangcloud.exceptions import InternalServerError, RateLimitError, BadInputError, AuthError, YfyAPIException
+from fangcloud.exceptions import InternalServerError, RateLimitError, BadInputError, AuthError, YfyAPIException, DownloadError
 from fangcloud.session import create_session
 from fangcloud.system_info import YfySystemInfo
 
@@ -21,8 +21,6 @@ class Response(object):
         :param http_resp: requests.models.Response http_resp: A raw HTTP response. It will
             be used to stream the binary-body payload of the response
         """
-        assert isinstance(raw, six.string_types), \
-            'obj_result: expected string, got %r' % type(raw)
         if http_resp is not None:
             assert isinstance(http_resp, requests.models.Response), \
                 'http_resp: expected requests.models.Response, got %r' % \
@@ -45,6 +43,8 @@ class YfyTransport(object):
 
     # This is the default longest time we'll block on receiving data from the server
     _DEFAULT_TIMEOUT = 30
+
+    _DOWNLOAD_CHUNK_SIZE = 10240
 
     _ROUTE_STYLE_DOWNLOAD = 'download'
     _ROUTE_STYLE_UPLOAD = 'upload'
@@ -113,9 +113,21 @@ class YfyTransport(object):
         kwargs.setdefault('route_style', self._ROUTE_STYLE_UPLOAD)
         return self.request_with_retry(self._METHOD_POST, url, **kwargs)
 
-    def download_file(self, url, **kwargs):
+    def get_file(self, url, file_path, **kwargs):
         kwargs.setdefault('route_style', self._ROUTE_STYLE_DOWNLOAD)
-        return self.request_with_retry(self._METHOD_POST, url, **kwargs)
+        kwargs.setdefault('result_type', self._RESULT_TYPE_RAW)
+        raw, response = self.request_with_retry(self._METHOD_GET, url, **kwargs)
+
+        try:
+            # download file
+            with open(file_path, 'wb') as f:
+                for chunk in response.iter_content(chunk_size=self._DOWNLOAD_CHUNK_SIZE):
+                    if chunk:
+                        f.write(chunk)
+                        f.flush()
+        except Exception as exception:
+            raise DownloadError(response.status_code, str(exception))
+        return raw
 
     def request_with_retry(self,
                            method,
@@ -145,7 +157,7 @@ class YfyTransport(object):
                     if result_type == self._RESULT_TYPE_JSON:
                         return json.loads(result.raw)
                     elif result_type == self._RESULT_TYPE_RAW:
-                        return result.raw
+                        return result.raw, result.http_resp
                 elif isinstance(result, ErrorResponse):
                     raise YfyAPIException(result.request_id, result.status_code, result.raw)
                 else:
@@ -196,7 +208,6 @@ class YfyTransport(object):
             proxy = self._proxy
 
         # The contents of the body of the HTTP request
-        body = None
         stream = False
         if route_style == self._ROUTE_STYLE_RPC:
             headers['Content-Type'] = 'application/json'
@@ -229,8 +240,14 @@ class YfyTransport(object):
             else:
                 raise ValueError('Unknown method: %r' % method)
         elif route_style == self._ROUTE_STYLE_DOWNLOAD:
-            stream = True
-
+            r = self._session.get(url,
+                                  params=params,
+                                  headers=headers,
+                                  stream=True,
+                                  verify=True,
+                                  proxies=proxy,
+                                  timeout=timeout
+                                 )
         elif route_style == self._ROUTE_STYLE_UPLOAD:
             file_handler = open(upload_file_path, 'rb')
             files = {'file': ("yifangyun-file", file_handler, {'Expires': '0'})}
@@ -250,7 +267,7 @@ class YfyTransport(object):
 
         if 200 <= r.status_code <= 299:
             if route_style == self._ROUTE_STYLE_DOWNLOAD:
-                raw_resp = r.headers['dropbox-api-result']
+                raw_resp = True
             else:
                 raw_resp = r.content.decode('utf-8')
 
