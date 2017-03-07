@@ -43,6 +43,10 @@ class UrlBuilder(object):
         return ''.join([cls._HOST, '/api', '/file/%d/move' % file_id])
 
     @classmethod
+    def copy_file(cls):
+        return ''.join([cls._HOST, '/api', '/file/copy'])
+
+    @classmethod
     def create_folder(cls):
         return ''.join([cls._HOST, '/api', '/folder/create'])
 
@@ -50,6 +54,9 @@ class UrlBuilder(object):
     def delete_folder(cls, folder_id):
         return ''.join([cls._HOST, '/api', '/folder/%d/delete' % folder_id])
 
+    @classmethod
+    def get_folder_info(cls, folder_id):
+        return ''.join([cls._HOST, '/api', '/folder/%d/info' % folder_id])
 
 host = os.environ.get('YFY_HOST')
 if host is not None:

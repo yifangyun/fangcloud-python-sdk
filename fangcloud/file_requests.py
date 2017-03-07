@@ -78,7 +78,17 @@ class FileRequests(YfyTransport):
         }
         return self.post(url, request_json_arg=pay_load)
 
-
+    def copy_file(self, file_id, target_folder_id, check_conflict=True):
+        assert isinstance(file_id, int)
+        assert isinstance(target_folder_id, int)
+        assert isinstance(check_conflict, bool)
+        url = UrlBuilder.copy_file()
+        pay_load = {
+            "file_id": file_id,
+            "target_folder_id": target_folder_id,
+            "is_check_conflict": check_conflict
+        }
+        return self.post(url, request_json_arg=pay_load)
 
 
 

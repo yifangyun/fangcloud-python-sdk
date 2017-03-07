@@ -50,6 +50,6 @@ class FolderBasic(BasicTest):
 class FolderFunctionTest(FolderBasic):
 
     def test_get_folder_info(self):
-        pass
-
+        result = self.yfy_client.folder().get_folder_info(self.folder_id)
+        self.check_folder_response(result)
 

@@ -90,5 +90,19 @@ class FileFunctionTest(FileBasic):
     def test_move_file(self):
         result = self.yfy_client.file().move_file(self.file_id, self.folder_id)
         self.assertIsInstance(result, dict)
-        self.assertIs("success", result)
+        self.assertIn("success", result)
+        # move back
+        result = self.yfy_client.file().move_file(self.file_id, 0)
+        self.assertIsInstance(result, dict)
+        self.assertIn("success", result)
+
+    def test_copy_file(self):
+        result = self.yfy_client.file().copy_file(self.file_id, self.folder_id, True)
+        self.check_file_response(result)
+
+
+
+
+
+
 

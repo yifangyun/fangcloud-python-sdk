@@ -23,6 +23,8 @@ class FolderRequests(YfyTransport):
         url = UrlBuilder.delete_folder(folder_id)
         return self.post(url)
 
-
-
+    def get_folder_info(self, folder_id):
+        assert isinstance(folder_id, int)
+        url = UrlBuilder.get_folder_info(folder_id)
+        return self.get(url)
 
