@@ -1,6 +1,8 @@
 from function.basic import BasicTest
 
 create_folder_name = 'unittest_folder'
+rename_folder = 'rename_folder'
+move_folder_parent_folder = 'move_folder_parent_folder'
 
 
 class FolderBasic(BasicTest):
@@ -12,6 +14,9 @@ class FolderBasic(BasicTest):
         result = self.yfy_client.folder().create_folder(create_folder_name, 0)
         self.check_folder_response(result)
         self.folder_id = result["id"]
+        result = self.yfy_client.folder().create_folder(move_folder_parent_folder, 0)
+        self.check_folder_response(result)
+        self.parent_folder_id = result["id"]
 
     def check_folder_response(self, result):
         self.assertIsInstance(result, dict)
@@ -45,6 +50,9 @@ class FolderBasic(BasicTest):
         result = self.yfy_client.folder().delete_folder(self.folder_id)
         self.assertIsInstance(result, dict)
         self.assertIn("success", result)
+        result = self.yfy_client.folder().delete_folder(self.parent_folder_id)
+        self.assertIsInstance(result, dict)
+        self.assertIn("success", result)
 
 
 class FolderFunctionTest(FolderBasic):
@@ -52,4 +60,25 @@ class FolderFunctionTest(FolderBasic):
     def test_get_folder_info(self):
         result = self.yfy_client.folder().get_folder_info(self.folder_id)
         self.check_folder_response(result)
+
+    def test_update_folder(self):
+        result = self.yfy_client.folder().update_folder(self.folder_id, "rename_folder")
+        self.check_folder_response(result)
+
+    def test_move_folder(self):
+        result = self.yfy_client.folder().move_folder(self.folder_id, self.parent_folder_id)
+        self.assertIsInstance(result, dict)
+        self.assertIn("success", result)
+
+    def test_search(self):
+        result = self.yfy_client.item().search(create_folder_name)
+        self.assertIsInstance(result, dict)
+        self.assertIn("page_id", result)
+        self.assertIn("page_capacity", result)
+        self.assertIn("files", result)
+        self.assertIn("folders", result)
+        self.assertIn("total_count", result)
+
+
+
 

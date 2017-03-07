@@ -3,6 +3,7 @@ import threading
 from abc import ABCMeta, abstractmethod
 
 from fangcloud.folder_requests import FolderRequests
+from fangcloud.item_requests import ItemRequests
 from fangcloud.system_info import YfySystemInfo
 from fangcloud.file_requests import FileRequests
 from fangcloud.user_requests import UserRequests
@@ -30,6 +31,7 @@ class YfyClient(object):
         self._file_requests = FileRequests(self)
         self._folder_requests = FolderRequests(self)
         self._user_requests = UserRequests(self)
+        self._item_requests = ItemRequests(self)
 
     def file(self):
         return self._file_requests
@@ -39,6 +41,9 @@ class YfyClient(object):
 
     def user(self):
         return self._user_requests
+
+    def item(self):
+        return self._item_requests
 
 
 class YfyClientFactory(object):
