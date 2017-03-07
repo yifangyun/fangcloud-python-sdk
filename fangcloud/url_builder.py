@@ -38,6 +38,19 @@ class UrlBuilder(object):
     def download_file(cls, file_id):
         return ''.join([cls._HOST, '/api', '/file/%d/download' % file_id])
 
+    @classmethod
+    def move_file(cls, file_id):
+        return ''.join([cls._HOST, '/api', '/file/%d/move' % file_id])
+
+    @classmethod
+    def create_folder(cls):
+        return ''.join([cls._HOST, '/api', '/folder/create'])
+
+    @classmethod
+    def delete_folder(cls, folder_id):
+        return ''.join([cls._HOST, '/api', '/folder/%d/delete' % folder_id])
+
+
 host = os.environ.get('YFY_HOST')
 if host is not None:
     UrlBuilder.set_host(host)

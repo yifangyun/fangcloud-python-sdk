@@ -15,7 +15,7 @@ class FileRequests(YfyTransport):
         url = UrlBuilder.get_file_info(file_id)
         return self.get(url)
 
-    def update_info(self, file_id, file_name, description = None):
+    def update_info(self, file_id, file_name, description=None):
         assert isinstance(file_id, int)
         url = UrlBuilder.update_file_info(file_id)
         pay_load = {
@@ -24,7 +24,7 @@ class FileRequests(YfyTransport):
         }
         return self.post(url, request_json_arg=pay_load)
 
-    def upload_new_file(self, file_path, parent_id):
+    def get_upload_new_file_url(self, file_path, parent_id):
         _, name = os.path.split(file_path)
         pre_sign_url = UrlBuilder.upload_new_file_pre_sign()
         pay_load = {
@@ -33,7 +33,10 @@ class FileRequests(YfyTransport):
             "upload_type": "api"
         }
         result = self.post(pre_sign_url, request_json_arg=pay_load)
-        upload_url = result["presign_url"]
+        return result["presign_url"]
+
+    def upload_new_file(self, file_path, parent_id):
+        upload_url = self.get_upload_new_file_url(file_path, parent_id)
         return self.post_file(upload_url, upload_file_path=file_path)
 
     def download_file(self, file_id, file_path):
@@ -66,18 +69,16 @@ class FileRequests(YfyTransport):
         }
         return self.post(url, request_json_arg=pay_load)
 
+    def move_file(self, file_id, target_parent_id):
+        assert isinstance(file_id, int)
+        assert isinstance(target_parent_id, int)
+        url = UrlBuilder.move_file(file_id)
+        pay_load = {
+            "target_folder_id": target_parent_id
+        }
+        return self.post(url, request_json_arg=pay_load)
 
-class FolderRequests(YfyTransport):
-
-    def __init__(self, client):
-        self.client = client
-        super(FolderRequests, self).__init__(self.client.access_token, self.client.refresh_token)
 
 
-class UserRequests(YfyTransport):
-
-    def __init__(self, client):
-        self.client = client
-        super(UserRequests, self).__init__(self.client.access_token, self.client.refresh_token)
 
 

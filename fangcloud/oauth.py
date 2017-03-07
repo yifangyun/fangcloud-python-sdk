@@ -103,7 +103,7 @@ class FangcloudOAuth2FlowBase(object):
         return OAuth2FlowNoRedirectResult(
             result['access_token'],
             result['refresh_token'],
-            result['expires_in']
+            result.get('expires_in', None)  # none if never expires
         )
 
     def build_url(self, target, params=None):

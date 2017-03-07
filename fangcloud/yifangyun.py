@@ -2,8 +2,10 @@ import threading
 
 from abc import ABCMeta, abstractmethod
 
+from fangcloud.folder_requests import FolderRequests
 from fangcloud.system_info import YfySystemInfo
-from fangcloud.yfy_requests import FileRequests, FolderRequests, UserRequests
+from fangcloud.file_requests import FileRequests
+from fangcloud.user_requests import UserRequests
 
 
 class YfyNewTokenCallBack(object):
