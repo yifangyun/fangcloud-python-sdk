@@ -1,4 +1,5 @@
-from function.basic import BasicTest
+
+from .basic import BasicTest
 
 create_folder_name = 'unittest_folder'
 rename_folder = 'rename_folder'

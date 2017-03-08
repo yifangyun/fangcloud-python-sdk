@@ -1,4 +1,4 @@
-from function.basic import BasicTest
+from .basic import BasicTest
 
 
 class UserTest(BasicTest):

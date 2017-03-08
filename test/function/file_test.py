@@ -1,10 +1,12 @@
 import os
 
-from function.basic import BasicTest
+from .basic import BasicTest
 
 download_file_path = "unittest_download_file"
 rename_file_path = "renamed_by_unittest"
 folder_name = "unittest_folder_for_file"
+upload_file_txt = "test_upload.txt"
+delete_from_trash_file_txt = "delete_from_trash_file.txt"
 
 
 class FileBasic(BasicTest):
@@ -14,11 +16,18 @@ class FileBasic(BasicTest):
     def setUp(self):
         super(FileBasic, self).setUp()
         # upload single file
-        result = self.yfy_client.file().upload_new_file("__init__.py", 0)
+        self.new_file(upload_file_txt)
+        self.new_file(delete_from_trash_file_txt)
+        result = self.yfy_client.file().upload_new_file(upload_file_txt, 0)
         self.check_file_response(result)
         self.file_id = result["id"]
         result = self.yfy_client.folder().create_folder(folder_name, 0)
         self.folder_id = result["id"]
+
+    @staticmethod
+    def new_file(name):
+        with open(name, "w") as f:
+            f.write(name)
 
     def check_file_response(self, result):
         self.assertIsInstance(result, dict)
@@ -60,7 +69,10 @@ class FileBasic(BasicTest):
         result = self.yfy_client.folder().delete_folder(self.folder_id)
         self.assertIsInstance(result, dict)
         self.assertIn("success", result)
-
+        if os.path.exists(delete_from_trash_file_txt):
+            os.remove(delete_from_trash_file_txt)
+        if os.path.exists(upload_file_txt):
+            os.remove(upload_file_txt)
 
 class FileFunctionTest(FileBasic):
 
@@ -74,7 +86,7 @@ class FileFunctionTest(FileBasic):
         self.check_file_response(result)
 
     def test_get_upload_url(self):
-        result = self.yfy_client.file().get_upload_new_file_url("file_test.py", 0)
+        result = self.yfy_client.file().get_upload_new_file_url(upload_file_txt, 0)
         self.check_url(result)
 
     def test_download_file(self):
@@ -109,7 +121,7 @@ class FileFunctionTest(FileBasic):
         self.assertIn("success", result)
 
     def test_delete_from_trash(self):
-        result = self.yfy_client.file().upload_new_file("file_test.py", 0)
+        result = self.yfy_client.file().upload_new_file(delete_from_trash_file_txt, 0)
         self.check_file_response(result)
         file_id = result["id"]
         result = self.yfy_client.file().delete_file(file_id)
