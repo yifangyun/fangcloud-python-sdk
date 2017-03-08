@@ -1,3 +1,4 @@
+from fangcloud.base_type import ItemType
 from fangcloud.transport import YfyTransport
 from fangcloud.url_builder import UrlBuilder
 
@@ -23,6 +24,16 @@ class FolderRequests(YfyTransport):
         url = UrlBuilder.delete_folder(folder_id)
         return self.post(url)
 
+    def restore_folder_from_trash(self, folder_id):
+        assert isinstance(folder_id, int)
+        url = UrlBuilder.restore_folder_from_trash(folder_id)
+        return self.post(url)
+
+    def delete_from_trash(self, folder_id):
+        assert isinstance(folder_id, int)
+        url = UrlBuilder.delete_folder_from_trash(folder_id)
+        return self.post(url)
+
     def get_folder_info(self, folder_id):
         assert isinstance(folder_id, int)
         url = UrlBuilder.get_folder_info(folder_id)
@@ -46,7 +57,24 @@ class FolderRequests(YfyTransport):
         }
         return self.post(url, request_json_arg=pay_load)
 
-
-
-
+    def get_children(self, folder_id, page_id=0, page_capacity=20, item_type=ItemType.Item):
+        """
+        :param folder_id:
+        :param page_id: Default = 0
+        :param page_capacity: Default = 20
+        :param (optional) item_type: search item type, for example: file, folder, all. Default, all
+        :return:
+        """
+        assert isinstance(folder_id, int)
+        assert isinstance(page_id, int)
+        assert isinstance(page_capacity, int)
+        assert isinstance(item_type, str)
+        url = UrlBuilder.get_children()
+        query = {
+            "folder_id": folder_id,
+            "page_id": page_id,
+            "page_capacity": page_capacity,
+            "type": item_type
+        }
+        return self.get(url, params=query)
 

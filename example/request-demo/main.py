@@ -21,8 +21,8 @@ class FileHandler(object):
 
 if __name__ == '__main__':
     file_handler = FileHandler(Config.access_token)
-    file_handler.update_file_info(501001367803, "renamed_by_test")
-
+    result = file_handler.update_file_info(501001367803, "renamed_by_test")
+    print(result)
     # file_info = file_handler.get_file_info(501001367803)
     # print(file_info)
     # file_info = file_handler.upload_file("/Users/lrenjundk/Documents/workspace-python/python-sdk/example/request-demo/config.py")

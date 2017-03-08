@@ -61,13 +61,23 @@ class FileRequests(YfyTransport):
         }
         return self.post(url, request_json_arg=pay_load)
 
-    def restore_from_trash(self, file_ids):
+    def restore_from_trash(self, file_id):
+        assert isinstance(file_id, int)
+        url = UrlBuilder.restore_file_from_trash(file_id)
+        return self.post(url)
+
+    def restore_from_trash_batch(self, file_ids):
         assert isinstance(file_ids, list) or isinstance(file_ids, tuple)
-        url = UrlBuilder.restore_file_from_trash()
+        url = UrlBuilder.restore_file_batch_from_trash()
         pay_load = {
             "file_ids": file_ids
         }
         return self.post(url, request_json_arg=pay_load)
+
+    def delete_from_trash(self, file_id):
+        assert isinstance(file_id, int)
+        url = UrlBuilder.delete_file_from_trash(file_id)
+        return self.post(url)
 
     def move_file(self, file_id, target_parent_id):
         assert isinstance(file_id, int)
@@ -89,6 +99,9 @@ class FileRequests(YfyTransport):
             "is_check_conflict": check_conflict
         }
         return self.post(url, request_json_arg=pay_load)
+
+
+
 
 
 

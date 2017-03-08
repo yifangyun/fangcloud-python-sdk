@@ -100,6 +100,25 @@ class FileFunctionTest(FileBasic):
         result = self.yfy_client.file().copy_file(self.file_id, self.folder_id, True)
         self.check_file_response(result)
 
+    def test_restore_file_from_trash(self):
+        result = self.yfy_client.file().delete_file(self.file_id)
+        self.assertIsInstance(result, dict)
+        self.assertEqual(result["success"], True)
+        result = self.yfy_client.file().restore_from_trash(self.file_id)
+        self.assertIsInstance(result, dict)
+        self.assertIn("success", result)
+
+    def test_delete_from_trash(self):
+        result = self.yfy_client.file().upload_new_file("file_test.py", 0)
+        self.check_file_response(result)
+        file_id = result["id"]
+        result = self.yfy_client.file().delete_file(file_id)
+        self.assertIsInstance(result, dict)
+        self.assertEqual(result["success"], True)
+        result = self.yfy_client.file().delete_from_trash(file_id)
+        self.assertIsInstance(result, dict)
+        self.assertEqual(result["success"], True)
+
 
 
 

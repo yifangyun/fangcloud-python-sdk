@@ -31,8 +31,16 @@ class UrlBuilder(object):
         return ''.join([cls._HOST, '/api', '/file/delete_batch'])
 
     @classmethod
-    def restore_file_from_trash(cls):
+    def restore_file_from_trash(cls, file_id):
+        return ''.join([cls._HOST, '/api', '/file/%d/restore_from_trash' % file_id])
+
+    @classmethod
+    def restore_file_batch_from_trash(cls):
         return ''.join([cls._HOST, '/api', '/file/restore_from_trash'])
+
+    @classmethod
+    def delete_file_from_trash(cls, file_id):
+        return ''.join([cls._HOST, '/api', '/file/%d/delete_from_trash' % file_id])
 
     @classmethod
     def download_file(cls, file_id):
@@ -55,6 +63,14 @@ class UrlBuilder(object):
         return ''.join([cls._HOST, '/api', '/folder/%d/delete' % folder_id])
 
     @classmethod
+    def restore_folder_from_trash(cls, folder_id):
+        return ''.join([cls._HOST, '/api', '/folder/%d/restore_from_trash' % folder_id])
+
+    @classmethod
+    def delete_folder_from_trash(cls, folder_id):
+        return ''.join([cls._HOST, '/api', '/folder/%d/delete_from_trash' % folder_id])
+
+    @classmethod
     def get_folder_info(cls, folder_id):
         return ''.join([cls._HOST, '/api', '/folder/%d/info' % folder_id])
 
@@ -65,6 +81,10 @@ class UrlBuilder(object):
     @classmethod
     def move_folder(cls, folder_id):
         return ''.join([cls._HOST, '/api', '/folder/%d/move' % folder_id])
+
+    @classmethod
+    def get_children(cls):
+        return ''.join([cls._HOST, '/api', '/folder/children'])
 
     @classmethod
     def search(cls):

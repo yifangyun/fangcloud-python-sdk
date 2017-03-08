@@ -3,6 +3,7 @@ from function.basic import BasicTest
 create_folder_name = 'unittest_folder'
 rename_folder = 'rename_folder'
 move_folder_parent_folder = 'move_folder_parent_folder'
+delete_folder_from_trash = 'delete_folder_from_trash'
 
 
 class FolderBasic(BasicTest):
@@ -46,6 +47,14 @@ class FolderBasic(BasicTest):
         self.assertIn("enterprise_id", result["owned_by"])
         self.assertIn("id", result["owned_by"])
 
+    def check_list(self, result):
+        self.assertIsInstance(result, dict)
+        self.assertIn("page_id", result)
+        self.assertIn("page_capacity", result)
+        self.assertIn("files", result)
+        self.assertIn("folders", result)
+        self.assertIn("total_count", result)
+
     def tearDown(self):
         result = self.yfy_client.folder().delete_folder(self.folder_id)
         self.assertIsInstance(result, dict)
@@ -72,12 +81,31 @@ class FolderFunctionTest(FolderBasic):
 
     def test_search(self):
         result = self.yfy_client.item().search(create_folder_name)
+        self.check_list(result)
+
+    def test_get_children(self):
+        result = self.yfy_client.folder().get_children(0)
+        self.check_list(result)
+
+    def test_restore_from_trash(self):
+        result = self.yfy_client.folder().delete_folder(self.folder_id)
         self.assertIsInstance(result, dict)
-        self.assertIn("page_id", result)
-        self.assertIn("page_capacity", result)
-        self.assertIn("files", result)
-        self.assertIn("folders", result)
-        self.assertIn("total_count", result)
+        self.assertIn("success", result)
+        result = self.yfy_client.folder().restore_folder_from_trash(self.folder_id)
+        self.assertIsInstance(result, dict)
+        self.assertIn("success", result)
+
+    def test_delete_from_trash(self):
+        global delete_folder_from_trash
+        result = self.yfy_client.folder().create_folder(delete_folder_from_trash, 0)
+        self.check_folder_response(result)
+        folder_id = result["id"]
+        result = self.yfy_client.folder().delete_folder(folder_id)
+        self.assertIsInstance(result, dict)
+        self.assertIn("success", result)
+        result = self.yfy_client.folder().delete_from_trash(folder_id)
+        self.assertIsInstance(result, dict)
+        self.assertIn("success", result)
 
 
 
