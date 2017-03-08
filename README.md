@@ -1,3 +1,5 @@
+[TOC]
+
 # 亿方云Python SDK
 
 亿方云Python版本SDK，集成亿方云V1系列API，具有强大的文件管理能力。该SDK可以运行在Python2.7和Python3的各个版之上。
@@ -141,7 +143,14 @@ print('file_name: '+file_info['name'])
 
 > $ YFY_TOKEN=... tox
 
-如果使用IDE，例如PyCharm，来运行tox，请在IDE中进行配置运行时环境变量
+如果使用IDE，例如PyCharm或者Eclipse等IDE，来运行tox，请在IDE中进行配置运行时环境变量，或者在系统中配置环境变量，环境变量包括：
+
+> * YFY_TOKEN
+> * YFY_REFRESH_TOKEN
+> * YFY_CLIENT_ID
+> * YFY_CLIENT_SECRET
+
+tox会自动读取环境变量，初始化测试例，执行测试代码。
 
 
 

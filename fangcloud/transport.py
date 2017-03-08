@@ -62,6 +62,7 @@ class YfyTransport(object):
     def __init__(self,
                  oauth2_access_token,
                  oauth2_refresh_token,
+                 call_back,
                  max_retries_on_error=2,
                  max_retries_on_rate_limit=None,
                  session=None,
@@ -95,6 +96,7 @@ class YfyTransport(object):
         self._headers = headers
         self._timeout = timeout
         self._proxy = proxy
+        self._call_back = call_back
         self._logger = logging.getLogger('yifangyun')
 
         if session:
@@ -291,6 +293,8 @@ class YfyTransport(object):
                 result = oauth2.refresh_token(self._oauth2_refresh_token)
                 self._oauth2_access_token = result.access_token
                 self._oauth2_refresh_token = result.refresh_token
+                if self._call_back is not None:
+                    self._call_back.on_token_refresh(result.access_token, result.refresh_token)
                 raise TokenRefreshed(request_id)
             elif r.status_code == 429:
                 err = None

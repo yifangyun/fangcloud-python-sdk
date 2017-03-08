@@ -14,7 +14,7 @@ class YfyNewTokenCallBack(object):
     __metaclass__ = ABCMeta
 
     @abstractmethod
-    def on_token_refresh(self):
+    def on_token_refresh(self, oauth_token, oauth_refresh_token):
         """
         implement this function in subclass
         this function will be called when token refreshed

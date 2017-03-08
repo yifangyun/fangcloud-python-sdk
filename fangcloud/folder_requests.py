@@ -7,7 +7,7 @@ class FolderRequests(YfyTransport):
 
     def __init__(self, client):
         self.client = client
-        super(FolderRequests, self).__init__(self.client.access_token, self.client.refresh_token)
+        super(FolderRequests, self).__init__(self.client.access_token, self.client.refresh_token, self.client.call_back)
 
     def create_folder(self, name, parent_id):
         assert isinstance(name, str)

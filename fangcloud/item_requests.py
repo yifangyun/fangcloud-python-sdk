@@ -7,7 +7,7 @@ class ItemRequests(YfyTransport):
 
     def __init__(self, client):
         self.client = client
-        super(ItemRequests, self).__init__(self.client.access_token, self.client.refresh_token)
+        super(ItemRequests, self).__init__(self.client.access_token, self.client.refresh_token, self.client.call_back)
 
     def search(self,
                query_words,

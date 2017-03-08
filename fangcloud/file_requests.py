@@ -8,7 +8,7 @@ class FileRequests(YfyTransport):
 
     def __init__(self, client):
         self.client = client
-        super(FileRequests, self).__init__(self.client.access_token, self.client.refresh_token)
+        super(FileRequests, self).__init__(self.client.access_token, self.client.refresh_token, self.client.call_back)
 
     def get_info(self, file_id):
         assert isinstance(file_id, int)
