@@ -8,7 +8,8 @@ import requests
 import six
 from requests_toolbelt import MultipartEncoderMonitor
 
-from fangcloud.exceptions import InternalServerError, RateLimitError, BadInputError, AuthError, YfyAPIException, DownloadError
+from fangcloud.exceptions import InternalServerError, RateLimitError, BadInputError, AuthError, YfyAPIException, DownloadError, TokenRefreshed
+from fangcloud.oauth import FangcloudOAuth2FlowBase
 from fangcloud.session import create_session
 from fangcloud.system_info import YfySystemInfo
 
@@ -178,10 +179,12 @@ class YfyTransport(object):
                         self._max_retries_on_rate_limit >= rate_limit_errors):
                     # Set default back off to 5 seconds.
                     back_off = e.back_off if e.back_off is not None else 5.0
-                    self._logger.info('Ratelimit: Retrying in %.1f seconds.', back_off)
+                    self._logger.info('Rate limit: Retrying in %.1f seconds.', back_off)
                     time.sleep(back_off)
                 else:
                     raise
+            except TokenRefreshed as e:
+                pass
 
     def send_request(self,
                      method,
@@ -284,7 +287,11 @@ class YfyTransport(object):
             elif r.status_code == 400:
                 raise BadInputError(request_id, r.status_code, r.text)
             elif r.status_code == 401:
-                raise AuthError(request_id)
+                oauth2 = FangcloudOAuth2FlowBase(request_session=self._session, request_id=request_id)
+                result = oauth2.refresh_token(self._oauth2_refresh_token)
+                self._oauth2_access_token = result.access_token
+                self._oauth2_refresh_token = result.refresh_token
+                raise TokenRefreshed(request_id)
             elif r.status_code == 429:
                 err = None
                 retry_after = r.headers.get('X-Rate-Limit-Reset')
@@ -294,5 +301,8 @@ class YfyTransport(object):
                 return ErrorResponse(request_id, r.status_code, raw_resp)
             else:
                 raise YfyAPIException(request_id, r.status_code, r.text)
+
+
+
 
 

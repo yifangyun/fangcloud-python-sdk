@@ -1,6 +1,6 @@
 import os
 
-from .basic import BasicTest
+from function.basic import BasicTest
 
 download_file_path = "unittest_download_file"
 rename_file_path = "renamed_by_unittest"

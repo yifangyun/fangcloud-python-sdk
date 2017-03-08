@@ -104,3 +104,7 @@ class RateLimitError(YfyAPIException):
         return 'RateLimitError (request_id = {!r}, error = {!r})'.format(self.request_id, self.error)
 
 
+class TokenRefreshed(YfyAPIException):
+
+    def __init__(self, request_id):
+        super(TokenRefreshed, self).__init__(request_id, 200, None)

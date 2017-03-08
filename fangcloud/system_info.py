@@ -3,6 +3,7 @@ class YfySystemInfo:
 
     client_id = None
     client_secret = None
+
     sdk_version = "0.0.1"
 
     @classmethod
@@ -17,4 +18,6 @@ class YfySystemInfo:
     @classmethod
     def get_client_secret(cls):
         return cls.client_secret
+
+
 

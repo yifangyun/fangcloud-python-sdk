@@ -9,6 +9,8 @@ if access_token is None:
     print('Set YFY_TOKEN environment variable to a valid token.')
     sys.exit(1)
 
+access_refresh_token = os.environ.get('YFY_REFRESH_TOKEN')
+
 client_id = os.environ.get('YFY_CLIENT_ID')
 if client_id is None:
     print('Set YFY_CLIENT_ID environment is not variable.')
@@ -25,7 +27,7 @@ YfyInit.init_system(client_id, client_secret)
 class BasicTest(unittest.TestCase):
 
     def setUp(self):
-        self.yfy_client = YfyClientFactory.get_client_instance("user-id", access_token)
+        self.yfy_client = YfyClientFactory.get_client_instance("user-id", access_token, access_refresh_token)
 
     def tearDown(self):
         pass

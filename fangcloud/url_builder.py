@@ -4,7 +4,16 @@ import os
 class UrlBuilder(object):
 
     _HOST = "https://platform.fangcloud.net"
+    _OAUTH_HOST = "https://oauth.fangcloud.net"
     # _HOST = "https://platform-dev.fangcloud.net"
+
+    @classmethod
+    def get_oauth_host(cls):
+        return cls._OAUTH_HOST
+
+    @classmethod
+    def get_host(cls):
+        return cls._HOST
 
     @classmethod
     def set_host(cls, value):
