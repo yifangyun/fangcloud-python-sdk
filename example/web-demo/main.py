@@ -206,6 +206,8 @@ class AuthFinishHandler(BasicHandler):
             pass
         try:
             result = self.__oauth__.authenticate(code, Config.redirect_url)
+            self.__database__.update_user(username, result.access_token, result.refresh_token)
+            self.__database__.save_user_db()
         except OAuthCodeParamError:
             self.send_error(400, reason="On /fangcloud-auth-finish: Wrong oauth code to fetch oauth token in finish")
             return

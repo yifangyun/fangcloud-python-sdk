@@ -61,3 +61,8 @@ class UserDatabase(object):
     def add_user(self, username, access_token = None, refresh_token = None):
         self.user_map[username] = User(username, access_token, refresh_token)
 
+    def update_user(self, username, access_token, refresh_token):
+        user = self.user_map.get(username)
+        if user is not None:
+            user.access_token = access_token
+            user.refresh_token = refresh_token
