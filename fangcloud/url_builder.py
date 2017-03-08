@@ -99,6 +99,10 @@ class UrlBuilder(object):
     def search(cls):
         return ''.join([cls._HOST, '/api', '/item/search'])
 
+    @classmethod
+    def get_self_info(cls):
+        return ''.join([cls._HOST, '/api', '/user/info'])
+
 host = os.environ.get('YFY_HOST')
 if host is not None:
     UrlBuilder.set_host(host)
