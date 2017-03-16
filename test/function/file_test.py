@@ -89,6 +89,15 @@ class FileFunctionTest(FileBasic):
         result = self.yfy_client.file().get_upload_new_file_url(upload_file_txt, 0)
         self.check_url(result)
 
+    def test_get_upload_new_version_url(self):
+        result = self.yfy_client.file().get_upload_new_version_url(self.file_id, upload_file_txt)
+        self.check_url(result)
+
+    def test_upload_new_version(self):
+        result = self.yfy_client.file().upload_new_version(self.file_id, upload_file_txt, remark="upload new version")
+        self.assertIsInstance(result, dict)
+        self.check_file_response(result)
+
     def test_download_file(self):
         global download_file_path
         result = self.yfy_client.file().download_file(self.file_id, download_file_path)

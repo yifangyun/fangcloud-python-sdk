@@ -32,6 +32,10 @@ class UrlBuilder(object):
         return ''.join([cls._HOST, '/api', '/file/upload'])
 
     @classmethod
+    def upload_new_version_pre_sign(cls, file_id):
+        return ''.join([cls._HOST, '/api', '/file/%d/new_version' % file_id])
+
+    @classmethod
     def delete_file(cls, file_id):
         return ''.join([cls._HOST, '/api', '/file/%d/delete' % file_id])
 

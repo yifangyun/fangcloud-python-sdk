@@ -39,6 +39,22 @@ class FileRequests(YfyTransport):
         upload_url = self.get_upload_new_file_url(file_path, parent_id)
         return self.post_file(upload_url, upload_file_path=file_path)
 
+    def get_upload_new_version_url(self, file_id, file_path, remark=None):
+        _, name = os.path.split(file_path)
+        new_version_pre_sign_url = UrlBuilder.upload_new_version_pre_sign(file_id)
+        pay_load = {
+            "name": name,
+            "upload_type": "api"
+        }
+        if remark is not None:
+            pay_load["remark"] = remark
+        result = self.post(new_version_pre_sign_url, request_json_arg=pay_load)
+        return result["presign_url"]
+
+    def upload_new_version(self, file_id, file_path, remark=None):
+        upload_url = self.get_upload_new_version_url(file_id, file_path, remark)
+        return self.post_file(upload_url, upload_file_path=file_path)
+
     def download_file(self, file_id, file_path):
         download_url = self.get_download_url(file_id)
         return self.get_file(download_url, file_path)
