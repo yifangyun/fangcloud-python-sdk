@@ -6,6 +6,7 @@ from fangcloud.folder_requests import FolderRequests
 from fangcloud.item_requests import ItemRequests
 from fangcloud.system_info import YfySystemInfo
 from fangcloud.file_requests import FileRequests
+from fangcloud.trash_requests import TrashRequests
 from fangcloud.user_requests import UserRequests
 
 
@@ -32,6 +33,7 @@ class YfyClient(object):
         self._folder_requests = FolderRequests(self)
         self._user_requests = UserRequests(self)
         self._item_requests = ItemRequests(self)
+        self._trash_requests = TrashRequests(self)
 
     def file(self):
         return self._file_requests
@@ -44,6 +46,9 @@ class YfyClient(object):
 
     def item(self):
         return self._item_requests
+
+    def trash(self):
+        return self._trash_requests
 
 
 class YfyClientFactory(object):

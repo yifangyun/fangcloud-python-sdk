@@ -57,12 +57,12 @@ class FolderRequests(YfyTransport):
         }
         return self.post(url, request_json_arg=pay_load)
 
-    def get_children(self, folder_id, page_id=0, page_capacity=20, item_type=ItemType.Item):
+    def get_children(self, folder_id, page_id=0, page_capacity=20, item_type=ItemType.All):
         """
         :param folder_id:
         :param page_id: Default = 0
         :param page_capacity: Default = 20
-        :param (optional) item_type: search item type, for example: file, folder, all. Default, all
+        :param (optional) item_type: children item type, for example: file, folder, all. Default, all
         :return:
         """
         assert isinstance(folder_id, int)

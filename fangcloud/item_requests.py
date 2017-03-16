@@ -1,4 +1,4 @@
-from fangcloud.base_type import SearchItemType, SortBy, SortDirection
+from fangcloud.base_type import ItemType, SortBy, SortDirection
 from fangcloud.transport import YfyTransport
 from fangcloud.url_builder import UrlBuilder
 
@@ -11,7 +11,7 @@ class ItemRequests(YfyTransport):
 
     def search(self,
                query_words,
-               item_type=SearchItemType.All,
+               item_type=ItemType.All,
                sort_by=SortBy.Name,
                sort_direction=SortDirection.Desc,
                page_number=0,

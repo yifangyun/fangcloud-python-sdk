@@ -107,6 +107,14 @@ class UrlBuilder(object):
     def get_self_info(cls):
         return ''.join([cls._HOST, '/api', '/user/info'])
 
+    @classmethod
+    def clear_trash(cls):
+        return ''.join([cls._HOST, '/api', '/trash/clear'])
+
+    @classmethod
+    def restore_trash(cls):
+        return ''.join([cls._HOST, '/api', '/trash/restore_all'])
+
 host = os.environ.get('YFY_HOST')
 if host is not None:
     UrlBuilder.set_host(host)
