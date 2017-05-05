@@ -115,8 +115,33 @@ class FileRequests(YfyTransport):
         }
         return self.post(url, request_json_arg=pay_load)
 
+    def get_share_links(self, file_id, page_id=None, owner_id=None):
+        """
+        获取文件的所有分享链接, 其中page_id, owner_id为可选项
 
+        :param file_id: 文件id
+        :param page_id: 页码 (Optional)
+        :param owner_id: 分享链接创建者id (Optional)
+        :return: 分享链接
+        """
+        assert isinstance(file_id, int)
+        url = UrlBuilder.get_file_share_links(file_id)
+        query = dict()
+        if page_id is not None:
+            query["page_id"] = page_id
+        if owner_id is not None:
+            query["owner_id"] = owner_id
+        return self.get(url, params=query)
 
+    def get_comments(self, file_id):
+        """
+        获取文件的评论列表
 
+        :param file_id: 文件id
+        :return: 文件评论列表
+        """
+        assert isinstance(file_id, int)
+        url = UrlBuilder.get_file_comment(file_id)
+        return self.get(url)
 
 

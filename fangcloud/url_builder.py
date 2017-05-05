@@ -69,6 +69,14 @@ class UrlBuilder(object):
         return ''.join([cls._HOST, cls._BASE_API, '/file/%d/copy' % file_id])
 
     @classmethod
+    def get_file_share_links(cls, file_id):
+        return ''.join([cls._HOST, cls._BASE_API, '/file/%d/share_links' % file_id])
+
+    @classmethod
+    def get_file_comment(cls, file_id):
+        return ''.join([cls._HOST, cls._BASE_API, '/file/%d/comments' % file_id])
+
+    @classmethod
     def create_folder(cls):
         return ''.join([cls._HOST, cls._BASE_API, '/folder/create'])
 

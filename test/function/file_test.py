@@ -140,7 +140,19 @@ class FileFunctionTest(FileBasic):
         self.assertIsInstance(result, dict)
         self.assertEqual(result["success"], True)
 
+    def test_get_file_share_links(self):
+        result = self.yfy_client.file().get_share_links(self.file_id)
+        self.assertIsInstance(result, dict)
+        self.assertIn("total_count", result)
+        self.assertIn("page_id", result)
+        self.assertIn("page_count", result)
+        self.assertIn("share_links", result)
 
+    def test_get_file_comment(self):
+        result = self.yfy_client.file().get_comments(self.file_id)
+        self.assertIsInstance(result, dict)
+        self.assertIn("comments", result)
+        self.assertIsInstance(result["comments"], list)
 
 
 
