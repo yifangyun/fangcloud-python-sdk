@@ -14,3 +14,16 @@ class SortBy:
 class SortDirection:
     Desc = "desc"
     ASC = "asc"
+
+
+class ShareLinkAccess:
+    Public = "public"
+    Company = "company"
+
+
+
+
+
+
+
+

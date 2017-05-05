@@ -4,6 +4,7 @@ from abc import ABCMeta, abstractmethod
 
 from fangcloud.folder_requests import FolderRequests
 from fangcloud.item_requests import ItemRequests
+from fangcloud.share_link_requests import ShareLinkRequests
 from fangcloud.system_info import YfySystemInfo
 from fangcloud.file_requests import FileRequests
 from fangcloud.trash_requests import TrashRequests
@@ -34,6 +35,7 @@ class YfyClient(object):
         self._user_requests = UserRequests(self)
         self._item_requests = ItemRequests(self)
         self._trash_requests = TrashRequests(self)
+        self._share_link_requests = ShareLinkRequests(self)
 
     def file(self):
         return self._file_requests
@@ -50,6 +52,8 @@ class YfyClient(object):
     def trash(self):
         return self._trash_requests
 
+    def share_link(self):
+        return self._share_link_requests
 
 class YfyClientFactory(object):
 

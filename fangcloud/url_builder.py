@@ -132,6 +132,22 @@ class UrlBuilder(object):
     def restore_trash(cls):
         return ''.join([cls._HOST, cls._BASE_API, '/trash/restore_all'])
 
+    @classmethod
+    def create_share_link(cls):
+        return ''.join([cls._HOST, cls._BASE_API, '/share_link/create'])
+
+    @classmethod
+    def get_share_link_info(cls, unique_name):
+        return ''.join([cls._HOST, cls._BASE_API, '/share_link/%s/info' % unique_name])
+
+    @classmethod
+    def update_share_link_info(cls, unique_name):
+        return ''.join([cls._HOST, cls._BASE_API, '/share_link/%s/update' % unique_name])
+
+    @classmethod
+    def revoke_share_link(cls, unique_name):
+        return ''.join([cls._HOST, cls._BASE_API, '/share_link/%s/revoke' % unique_name])
+
 host = os.environ.get('YFY_HOST')
 if host is not None:
     UrlBuilder.set_host(host)
