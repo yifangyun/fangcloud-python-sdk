@@ -69,9 +69,8 @@ class FolderRequests(YfyTransport):
         assert isinstance(page_id, int)
         assert isinstance(page_capacity, int)
         assert isinstance(item_type, str)
-        url = UrlBuilder.get_children()
+        url = UrlBuilder.get_children(folder_id)
         query = {
-            "folder_id": folder_id,
             "page_id": page_id,
             "page_capacity": page_capacity,
             "type": item_type
