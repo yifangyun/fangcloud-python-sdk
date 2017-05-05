@@ -74,6 +74,7 @@ class FileBasic(BasicTest):
         if os.path.exists(upload_file_txt):
             os.remove(upload_file_txt)
 
+
 class FileFunctionTest(FileBasic):
 
     def test_get_file_info(self):

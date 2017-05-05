@@ -108,6 +108,17 @@ class FolderFunctionTest(FolderBasic):
         self.assertIsInstance(result, dict)
         self.assertIn("success", result)
 
+    def test_get_folder_share_links(self):
+        result = self.yfy_client.folder().get_share_links(self.folder_id)
+        self.assertIsInstance(result, dict)
+        self.assertIn("total_count", result)
+        self.assertIn("page_id", result)
+        self.assertIn("page_count", result)
+        self.assertIn("share_links", result)
 
-
+    def test_get_folder_collaborations(self):
+        result = self.yfy_client.folder().get_folder_collaborations(self.folder_id)
+        self.assertIsInstance(result, dict)
+        self.assertIn("final_role", result)
+        self.assertIn("collab_info", result)
 

@@ -105,6 +105,14 @@ class UrlBuilder(object):
         return ''.join([cls._HOST, cls._BASE_API, '/folder/%d/move' % folder_id])
 
     @classmethod
+    def get_folder_share_links(cls, folder_id):
+        return ''.join([cls._HOST, cls._BASE_API, '/folder/%d/share_links' % folder_id])
+
+    @classmethod
+    def get_collaborations(cls, folder_id):
+        return ''.join([cls._HOST, cls._BASE_API, '/folder/%d/collabs' % folder_id])
+
+    @classmethod
     def get_children(cls, folder_id):
         return ''.join([cls._HOST, cls._BASE_API, '/folder/%d/children' % folder_id])
 
