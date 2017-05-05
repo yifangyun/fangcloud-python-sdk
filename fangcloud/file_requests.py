@@ -108,9 +108,8 @@ class FileRequests(YfyTransport):
         assert isinstance(file_id, int)
         assert isinstance(target_folder_id, int)
         assert isinstance(check_conflict, bool)
-        url = UrlBuilder.copy_file()
+        url = UrlBuilder.copy_file(file_id)
         pay_load = {
-            "file_id": file_id,
             "target_folder_id": target_folder_id,
             "is_check_conflict": check_conflict
         }
