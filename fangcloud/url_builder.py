@@ -125,6 +125,26 @@ class UrlBuilder(object):
         return ''.join([cls._HOST, cls._BASE_API, '/user/info'])
 
     @classmethod
+    def get_user_info(cls, user_id):
+        return ''.join([cls._HOST, cls._BASE_API, '/user/%s/info' % user_id])
+
+    @classmethod
+    def get_user_pic(cls, user_id):
+        return ''.join([cls._HOST, cls._BASE_API, '/user/%s/profile_pic_download' % user_id])
+
+    @classmethod
+    def update_user_info(cls):
+        return ''.join([cls._HOST, cls._BASE_API, '/user/update'])
+
+    @classmethod
+    def get_space_usage(cls):
+        return ''.join([cls._HOST, cls._BASE_API, '/user/space_usage'])
+
+    @classmethod
+    def search_user(cls):
+        return ''.join([cls._HOST, cls._BASE_API, '/user/search'])
+
+    @classmethod
     def clear_trash(cls):
         return ''.join([cls._HOST, cls._BASE_API, '/trash/clear'])
 
