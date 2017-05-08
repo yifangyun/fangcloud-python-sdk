@@ -10,3 +10,4 @@
 /fangcloud.egg-info
 .DS_Store
 /.eggs
+*.db

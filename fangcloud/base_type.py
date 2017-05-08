@@ -21,6 +21,16 @@ class ShareLinkAccess:
     Company = "company"
 
 
+class CollaborationRole:
+    Edit = "edit"
+    Viewer = "viewer"
+    Previewer = "previewer"
+    Uploader = "uploader"
+    Coowner = "coowner"
+    ViewerUploader = "viewer_uploader"
+    Owner = "owner"
+
+
 
 
 

@@ -148,6 +148,22 @@ class UrlBuilder(object):
     def revoke_share_link(cls, unique_name):
         return ''.join([cls._HOST, cls._BASE_API, '/share_link/%s/revoke' % unique_name])
 
+    @classmethod
+    def collaboration_invite(cls):
+        return ''.join([cls._HOST, cls._BASE_API, '/collab/invite'])
+
+    @classmethod
+    def get_collaboration_info(cls, collaboration_id):
+        return ''.join([cls._HOST, cls._BASE_API, '/collab/%s/info' % collaboration_id])
+
+    @classmethod
+    def update_collaboration(cls, collaboration_id):
+        return ''.join([cls._HOST, cls._BASE_API, '/collab/%s/update' % collaboration_id])
+
+    @classmethod
+    def delete_collaboration(cls, collaboration_id):
+        return ''.join([cls._HOST, cls._BASE_API, '/collab/%s/delete' % collaboration_id])
+
 host = os.environ.get('YFY_HOST')
 if host is not None:
     UrlBuilder.set_host(host)

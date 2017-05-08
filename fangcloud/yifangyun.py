@@ -2,6 +2,7 @@ import threading
 
 from abc import ABCMeta, abstractmethod
 
+from fangcloud.collaboration_requests import CollaborationRequests
 from fangcloud.folder_requests import FolderRequests
 from fangcloud.item_requests import ItemRequests
 from fangcloud.share_link_requests import ShareLinkRequests
@@ -36,6 +37,7 @@ class YfyClient(object):
         self._item_requests = ItemRequests(self)
         self._trash_requests = TrashRequests(self)
         self._share_link_requests = ShareLinkRequests(self)
+        self._collaboration_requests = CollaborationRequests(self)
 
     def file(self):
         return self._file_requests
@@ -54,6 +56,10 @@ class YfyClient(object):
 
     def share_link(self):
         return self._share_link_requests
+
+    def collaboration(self):
+        return self._collaboration_requests
+
 
 class YfyClientFactory(object):
 
