@@ -3,7 +3,7 @@ import os
 from fangcloud.base_type import ShareLinkAccess
 from .basic import BasicTest
 
-trash_file = "trash_file.txt"
+comment_file = "trash_file.txt"
 
 share_link_file_test = "share_link_file_test.txt"
 share_link_folder_test = "share_link_folder_test"

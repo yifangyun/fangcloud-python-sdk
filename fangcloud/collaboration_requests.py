@@ -9,7 +9,8 @@ class CollaborationRequests(YfyTransport):
         self.client = client
         super(CollaborationRequests, self).__init__(self.client.access_token, self.client.refresh_token, self.client.call_back)
 
-    def _check_role(self, role):
+    @staticmethod
+    def _check_role(role):
         assert role in [CollaborationRole.Coowner,
                         CollaborationRole.Edit,
                         CollaborationRole.Owner,

@@ -9,7 +9,7 @@ class TrashBasic(BasicTest):
 
     def setUp(self):
         super(TrashBasic, self).setUp()
-        global trash_file
+        global comment_file
         self.new_file(trash_file)
 
     @staticmethod
@@ -18,7 +18,7 @@ class TrashBasic(BasicTest):
             f.write(name)
 
     def tearDown(self):
-        global trash_file
+        global comment_file
         if os.path.exists(trash_file):
             os.remove(trash_file)
 

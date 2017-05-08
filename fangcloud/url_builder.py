@@ -164,6 +164,14 @@ class UrlBuilder(object):
     def delete_collaboration(cls, collaboration_id):
         return ''.join([cls._HOST, cls._BASE_API, '/collab/%s/delete' % collaboration_id])
 
+    @classmethod
+    def create_comment(cls):
+        return ''.join([cls._HOST, cls._BASE_API, '/comment/create'])
+
+    @classmethod
+    def delete_comment(cls, comment_id):
+        return ''.join([cls._HOST, cls._BASE_API, '/comment/%s/delete' % comment_id])
+
 host = os.environ.get('YFY_HOST')
 if host is not None:
     UrlBuilder.set_host(host)
