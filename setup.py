@@ -38,7 +38,7 @@ setup_requires = [
 
 setup(
         name='fangcloud',
-        version='2.2.0',
+        version='2.2.2',
         description='Official YiFangYun SDK for Open Platform',
         author='YiFangYun',
         author_email='linrenjun@yifangyun.com',
@@ -49,7 +49,7 @@ setup(
         tests_require=tests_require,
         setup_requires=setup_requires,
         zip_safe=False,
-        packages=['fangcloud','example'],
+        packages=['fangcloud'],
         package_data={'fangcloud': ['trusted-certs.crt']},
         # py_modules=['fangcloud'],
         classifiers=classifiers,
