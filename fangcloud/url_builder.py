@@ -1,10 +1,17 @@
 import os
 
+env_dist = os.environ
+
 
 class UrlBuilder(object):
 
-    _HOST = "https://platform.fangcloud.net"
-    _OAUTH_HOST = "https://oauth.fangcloud.net"
+    if env_dist.get('FangcloudTest') is not None:
+        _HOST = "https://platform.fangcloud.net"
+        _OAUTH_HOST = "https://oauth.fangcloud.net"
+    else:
+        _HOST = "https://open.fangcloud.com"
+        _OAUTH_HOST = "https://oauth.fangcloud.com"
+
     _BASE_API = "/api/v2"
     # _HOST = "https://platform-dev.fangcloud.net"
 
