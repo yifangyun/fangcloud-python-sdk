@@ -38,19 +38,22 @@ setup_requires = [
 
 setup(
         name='fangcloud',
-        version='0.0.1',
+        version='2.2.0',
         description='Official YiFangYun API Client',
         author='YiFangYun',
-        author_email='support@yifangyun.com',
-        url='http://www.yifangyun.com',
+        author_email='linrenjun@yifangyun.com',
+        maintainer='linrenjun',
+        maintainer_email='lrenjundk@foxmail.com',
+        url='https://www.yifangyun.com',
         install_requires=install_requires,
         tests_require=tests_require,
         setup_requires=setup_requires,
         zip_safe=False,
-        packages=['fangcloud'],
+        packages=['fangcloud','example'],
         package_data={'fangcloud': ['trusted-certs.crt']},
         # py_modules=['fangcloud'],
         classifiers=classifiers,
+        platforms=["all"],
         keywords='yifangyun api sdk',
         license='Apache Software License, Version 2.0, http://www.apache.org/licenses/LICENSE-2.0'
 )
