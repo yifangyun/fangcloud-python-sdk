@@ -39,7 +39,7 @@ setup_requires = [
 setup(
         name='fangcloud',
         version='2.2.0',
-        description='Official YiFangYun API Client',
+        description='Official YiFangYun SDK for Open Platform',
         author='YiFangYun',
         author_email='linrenjun@yifangyun.com',
         maintainer='linrenjun',
