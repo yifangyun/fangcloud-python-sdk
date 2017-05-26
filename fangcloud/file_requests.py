@@ -156,19 +156,19 @@ class FileRequests(YfyTransport):
         url = UrlBuilder.restore_file_from_trash(file_id)
         return self.post(url)
 
-    def restore_from_trash_batch(self, file_ids):
-        """
-        批量从回收站恢复文件
-
-        :param file_ids: 文件id列表
-        :return:
-        """
-        assert isinstance(file_ids, list) or isinstance(file_ids, tuple)
-        url = UrlBuilder.restore_file_batch_from_trash()
-        pay_load = {
-            "file_ids": file_ids
-        }
-        return self.post(url, request_json_arg=pay_load)
+    # def restore_from_trash_batch(self, file_ids):
+    #     """
+    #     批量从回收站恢复文件
+    #
+    #     :param file_ids: 文件id列表
+    #     :return:
+    #     """
+    #     assert isinstance(file_ids, list) or isinstance(file_ids, tuple)
+    #     url = UrlBuilder.restore_file_batch_from_trash()
+    #     pay_load = {
+    #         "file_ids": file_ids
+    #     }
+    #     return self.post(url, request_json_arg=pay_load)
 
     def delete_from_trash(self, file_id):
         """

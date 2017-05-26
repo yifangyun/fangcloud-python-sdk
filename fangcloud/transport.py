@@ -6,6 +6,7 @@ import time
 
 import requests
 import six
+import sys
 from requests_toolbelt import MultipartEncoderMonitor
 
 from fangcloud.exceptions import InternalServerError, RateLimitError, BadInputError, AuthError, YfyAPIException, DownloadError, TokenRefreshed
@@ -198,8 +199,10 @@ class YfyTransport(object):
                      proxy,
                      timeout):
         headers = {
-            'Authorization': 'Bearer %s' % self._oauth2_access_token
+            'Authorization': 'Bearer %s' % self._oauth2_access_token,
+            'X-Runtime-Version': sys.version.split(" ")[0]
         }
+
         if self._user_agent is not None:
             headers.update({'User-Agent': self._user_agent})
 
