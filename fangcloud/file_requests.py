@@ -1,7 +1,25 @@
+import hashlib
 import os
 
 from fangcloud.transport import YfyTransport
 from fangcloud.url_builder import UrlBuilder
+
+
+class Sha1Manager(object):
+
+    @staticmethod
+    def get_file_sha1(file_path, block_size=2 ** 20):
+        if not os.path.exists(file_path):
+            return None
+
+        sha1obj = hashlib.sha1()
+        with open(file_path, 'rb') as file_to_check:
+            while True:
+                data = file_to_check.read(block_size)
+                if not data:
+                    break
+                sha1obj.update(data)
+            return sha1obj.hexdigest()
 
 
 class FileRequests(YfyTransport):
@@ -98,7 +116,7 @@ class FileRequests(YfyTransport):
         upload_url = self.get_upload_new_version_url(file_id, file_path, remark)
         return self.post_file(upload_url, upload_file_path=file_path)
 
-    def download_file(self, file_id, file_path):
+    def download_file(self, file_id, file_path, checkSha1=False):
         """
         下载文件
 
@@ -107,7 +125,14 @@ class FileRequests(YfyTransport):
         :return:
         """
         download_url = self.get_download_url(file_id)
-        return self.get_file(download_url, file_path)
+        is_success = self.get_file(download_url, file_path)
+        if checkSha1 and is_success:
+            file_info = self.get_info(file_id)
+            sha1 = Sha1Manager.get_file_sha1(file_path)
+            if file_info["sha1"] != sha1:
+                os.remove(file_path)
+                return False
+        return is_success
 
     def get_download_url(self, file_id):
         """
@@ -118,7 +143,7 @@ class FileRequests(YfyTransport):
         """
         pre_sign_download_url = UrlBuilder.download_file(file_id)
         result = self.get(pre_sign_download_url)
-        return result["download_urls"][str(file_id)]
+        return result["download_url"]
 
     def delete_file(self, file_id):
         """
