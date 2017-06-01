@@ -1,25 +1,24 @@
-import hashlib
+
 import os
 
+from fangcloud.helper import Sha1Manager
 from fangcloud.transport import YfyTransport
 from fangcloud.url_builder import UrlBuilder
 
 
-class Sha1Manager(object):
-
-    @staticmethod
-    def get_file_sha1(file_path, block_size=2 ** 20):
-        if not os.path.exists(file_path):
-            return None
-
-        sha1obj = hashlib.sha1()
-        with open(file_path, 'rb') as file_to_check:
-            while True:
-                data = file_to_check.read(block_size)
-                if not data:
-                    break
-                sha1obj.update(data)
-            return sha1obj.hexdigest()
+class TransmissionObserver:
+    """
+    用于获取传输状态的观察者基类
+    """
+    def update(self, transfer, total, speed):
+        """
+        每秒传输状态的变动,都会回调此函数
+        :param transfer: (int) 已经传输的大小
+        :param total: (int) 总共需要传输的总量
+        :param speed: (string) 当前传输速度
+        :return: None
+        """
+        pass
 
 
 class FileRequests(YfyTransport):
@@ -73,16 +72,20 @@ class FileRequests(YfyTransport):
         result = self.post(pre_sign_url, request_json_arg=pay_load)
         return result["presign_url"]
 
-    def upload_new_file(self, file_path, parent_id):
+    def upload_new_file(self, file_path, parent_id, observer=None):
         """
         上传新文件
 
         :param file_path: 文件上传的本地路径
         :param parent_id: 要上传的目标文件夹的id
+        :param observer: 必须是TransmissionObserver的子类
         :return: 文件信息
         """
+        if observer is not None:
+            assert isinstance(observer, TransmissionObserver)
+
         upload_url = self.get_upload_new_file_url(file_path, parent_id)
-        return self.post_file(upload_url, upload_file_path=file_path)
+        return self.post_file(upload_url, upload_file_path=file_path, observer=observer)
 
     def get_upload_new_version_url(self, file_id, file_path, remark=None):
         """
@@ -104,17 +107,21 @@ class FileRequests(YfyTransport):
         result = self.post(new_version_pre_sign_url, request_json_arg=pay_load)
         return result["presign_url"]
 
-    def upload_new_version(self, file_id, file_path, remark=None):
+    def upload_new_version(self, file_id, file_path, observer=None, remark=None):
         """
         获取上传新版本
 
         :param file_id: 文件上传的本地路径
         :param file_path: 文件上传的本地路径
         :param remark: 上传新版本的备注
+        :param observer: 传输进度回调,必须为TransmissionObserver的子类
         :return: 文件信息
         """
+        if observer is not None:
+            assert isinstance(observer, TransmissionObserver)
+
         upload_url = self.get_upload_new_version_url(file_id, file_path, remark)
-        return self.post_file(upload_url, upload_file_path=file_path)
+        return self.post_file(upload_url, upload_file_path=file_path, observer=observer)
 
     def download_file(self, file_id, file_path, checkSha1=False):
         """

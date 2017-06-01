@@ -10,9 +10,26 @@ import sys
 from requests_toolbelt import MultipartEncoderMonitor
 
 from fangcloud.exceptions import InternalServerError, RateLimitError, BadInputError, AuthError, YfyAPIException, DownloadError, TokenRefreshed
+from fangcloud.helper import SpeedFormat
 from fangcloud.oauth import FangcloudOAuth2FlowBase
 from fangcloud.session import create_session
 from fangcloud.system_info import YfySystemInfo
+
+
+def handle_chunk(monitor):
+    current = time.time()
+    time_delta = current - monitor.time
+    if time_delta > 1:
+        if not hasattr(monitor, 'last_read'):
+            monitor.last_read = 0
+        byte_delta = monitor.bytes_read - monitor.last_read
+
+        speed = byte_delta*1.0/time_delta
+        format_speed = SpeedFormat.format(speed)
+
+        monitor.time = current
+        monitor.last_read = monitor.bytes_read
+        monitor.observer.update(monitor.last_read, monitor.total, format_speed)
 
 
 class Response(object):
@@ -124,11 +141,20 @@ class YfyTransport(object):
 
         try:
             # download file
+            observer = kwargs.get("observer")
+            transfer_time = time.time()
             with open(file_path, 'wb') as f:
                 for chunk in response.iter_content(chunk_size=self._DOWNLOAD_CHUNK_SIZE):
                     if chunk:
                         f.write(chunk)
                         f.flush()
+                        if observer is not None:
+                            current = time.time()
+                            time_delta = current - transfer_time
+                            if time_delta > 1:
+                                speed = len(chunk)/time_delta
+                                format_speed = SpeedFormat.format(speed)
+                                observer.update(self, len(chunk), response.headers.get("Content-Length"), format_speed)
         except Exception as exception:
             raise DownloadError(response.status_code, str(exception))
         return raw
@@ -142,7 +168,8 @@ class YfyTransport(object):
                            result_type=_RESULT_TYPE_JSON,
                            upload_file_path=None,
                            proxy=None,
-                           timeout=None):
+                           timeout=None,
+                           observer=None):
         attempt = 0
         rate_limit_errors = 0
         while True:
@@ -155,7 +182,8 @@ class YfyTransport(object):
                                            request_json_arg,
                                            upload_file_path,
                                            proxy,
-                                           timeout
+                                           timeout,
+                                           observer
                                            )
                 if isinstance(result, Response):
                     if result_type == self._RESULT_TYPE_JSON:
@@ -197,7 +225,8 @@ class YfyTransport(object):
                      request_json_arg,
                      upload_file_path,
                      proxy,
-                     timeout):
+                     timeout,
+                     observer):
         headers = {
             'Authorization': 'Bearer %s' % self._oauth2_access_token,
             'X-Runtime-Version': sys.version.split(" ")[0]
@@ -259,7 +288,13 @@ class YfyTransport(object):
         elif route_style == self._ROUTE_STYLE_UPLOAD:
             file_handler = open(upload_file_path, 'rb')
             files = {'file': ("yifangyun-file", file_handler, {'Expires': '0'})}
-            multipart_monitor = MultipartEncoderMonitor.from_fields(fields=files)
+            if observer is not None:
+                multipart_monitor = MultipartEncoderMonitor.from_fields(fields=files, callback=handle_chunk)
+                multipart_monitor.observer = observer
+                multipart_monitor.time = time.time()
+                multipart_monitor.total = os.path.getsize(upload_file_path)
+            else:
+                multipart_monitor = MultipartEncoderMonitor.from_fields(fields=files)
             headers['Content-Type'] = multipart_monitor.content_type
             r = self._session.post(url,
                                    headers=headers,
