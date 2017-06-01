@@ -111,6 +111,32 @@ class FangcloudOAuth2FlowBase(object):
             result.get('expires_in', None)  # none if never expires
         )
 
+    def password_login(self, user_name, password):
+        if user_name is None or password is None:
+            raise AuthError(self.request_id)
+
+        url = self.build_url('/oauth/token')
+        params = {
+            'grant_type': 'password',
+            'username': user_name,
+            'password': password
+        }
+        resp = self.requests_session.post(url, data=params, auth=HTTPBasicAuth(self.client_id, self.client_secret))
+        result = resp.json()
+
+        if resp.status_code >= 500:
+            raise InternalServerError(self.request_id, resp.status_code, resp.text)
+        elif resp.status_code == 400:
+            raise BadInputError(self.request_id, resp.status_code, resp.text)
+        elif resp.status_code == 200:
+            return OAuth2FlowNoRedirectResult(
+                result['access_token'],
+                result['refresh_token'],
+                result.get('expires_in', None)
+            )
+        else:
+            raise AuthError(self.request_id)
+
     def refresh_token(self, refresh_token):
         if refresh_token is None:
             raise AuthError(self.request_id)
