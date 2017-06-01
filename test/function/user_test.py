@@ -22,7 +22,10 @@ class UserBasicTest(BasicTest):
         self.assertIn("id", result)
         self.assertIn("pinyin_first_letters", result)
         self.assertIn("full_name_pinyin", result)
-        self.assertIn("enterprise_id", result)
+        self.assertIn("enterprise", result)
+        self.assertIn("id", result["enterprise"])
+        self.assertIn("name", result["enterprise"])
+        self.assertIn("admin_user_id", result["enterprise"])
         self.assertIn("phone", result)
         self.assertIn("profile_pic_key", result)
 

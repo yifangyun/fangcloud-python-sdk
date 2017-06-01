@@ -40,6 +40,10 @@ class ShareLinkBasic(BasicTest):
         self.assertIn("password_protected", result)
         self.assertIn("due_time", result)
         self.assertIn("disable_download", result)
+        self.assertIn("created_at", result)
+        self.assertIn("modified_at", result)
+        self.assertIn("download_count_total", result)
+        self.assertIn("view_count", result)
 
     def tearDown(self):
         global share_link_file_test
