@@ -123,17 +123,22 @@ class FileRequests(YfyTransport):
         upload_url = self.get_upload_new_version_url(file_id, file_path, remark)
         return self.post_file(upload_url, upload_file_path=file_path, observer=observer)
 
-    def download_file(self, file_id, file_path, checkSha1=False):
+    def download_file(self, file_id, file_path, check_sha1=False, observer=None):
         """
         下载文件
 
         :param file_id: 文件id
         :param file_path: 文件上传的本地路径
-        :return:
+        :param check_sha1: 是否下载完成之后自动校验sha1值
+        :param observer: 传输进度回调,必须为TransmissionObserver的子类
+        :return: True or False
         """
+        if observer is not None:
+            assert isinstance(observer, TransmissionObserver)
+
         download_url = self.get_download_url(file_id)
-        is_success = self.get_file(download_url, file_path)
-        if checkSha1 and is_success:
+        is_success = self.get_file(download_url, file_path, observer=observer)
+        if check_sha1 and is_success:
             file_info = self.get_info(file_id)
             sha1 = Sha1Manager.get_file_sha1(file_path)
             if file_info["sha1"] != sha1:
