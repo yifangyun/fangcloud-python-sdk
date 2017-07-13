@@ -1,3 +1,5 @@
+#encoding=utf-8
+
 from fangcloud.transport import YfyTransport
 from fangcloud.url_builder import UrlBuilder
 

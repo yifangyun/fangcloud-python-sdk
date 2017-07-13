@@ -1,3 +1,5 @@
+#encoding=utf-8
+
 from fangcloud.base_type import ItemType, SortBy, SortDirection, CollaborationRole
 from fangcloud.transport import YfyTransport
 from fangcloud.url_builder import UrlBuilder

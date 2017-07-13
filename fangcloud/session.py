@@ -1,3 +1,5 @@
+#encoding=utf-8
+
 import ssl
 import pkg_resources
 import requests
