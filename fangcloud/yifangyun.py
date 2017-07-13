@@ -1,4 +1,4 @@
-#encoding=utf-8
+# encoding=utf-8
 
 import threading
 
@@ -67,6 +67,7 @@ class YfyClient(object):
     def comment(self):
         return self._comment_requests
 
+
 class YfyClientFactory(object):
 
     _clients = dict()
@@ -74,6 +75,16 @@ class YfyClientFactory(object):
 
     @classmethod
     def get_client_instance(cls, key, access_token=None, refresh_token=None, call_back=None):
+        """
+        获取亿方云客户端
+
+        :param key: 通过key可以复用客户端,如果key为None,则会新建一个客户端
+        :param access_token: 亿方云的access token
+        :param refresh_token: 亿方云的refresh token
+        :param call_back: 刷新token时候的回调类, 必须继承自YfyNewTokenCallBack,
+                          用户可以通过该回调类中的on_token_refresh函数, 获取刷新之后的token信息
+        :return:
+        """
         assert key is not None and key != ""
         client = cls._clients.get(key, None)
         if client is None:
