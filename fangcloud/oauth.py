@@ -1,12 +1,16 @@
-#encoding=utf-8
-
+# encoding=utf-8
+import hashlib
 import os
+import random
+import time
 import urllib
 
+import jwt
 import six
 from requests.auth import HTTPBasicAuth
 
-from fangcloud.exceptions import OAuthCodeParamError, OAuthRedirectParamError, AuthError, InternalServerError, BadInputError
+from fangcloud.exceptions import OAuthCodeParamError, OAuthRedirectParamError, AuthError, InternalServerError, \
+    BadInputError
 from fangcloud.session import pinned_session
 from fangcloud.system_info import YfySystemInfo
 from fangcloud.url_builder import UrlBuilder
@@ -93,11 +97,11 @@ class FangcloudOAuth2FlowBase(object):
 
         url = self.build_url('/oauth/token')
         params = {
-                    'grant_type': 'authorization_code',
-                    'code': code,
-                    'client_id': self.client_id,
-                    'client_secret': self.client_secret,
-                  }
+            'grant_type': 'authorization_code',
+            'code': code,
+            'client_id': self.client_id,
+            'client_secret': self.client_secret,
+        }
         if self.locale is not None:
             params['locale'] = self.locale
         if redirect_uri is not None:
@@ -122,6 +126,82 @@ class FangcloudOAuth2FlowBase(object):
             'username': user_name,
             'password': password
         }
+        resp = self.requests_session.post(url, data=params, auth=HTTPBasicAuth(self.client_id, self.client_secret))
+        result = resp.json()
+
+        if resp.status_code >= 500:
+            raise InternalServerError(self.request_id, resp.status_code, resp.text)
+        elif resp.status_code == 400:
+            raise BadInputError(self.request_id, resp.status_code, resp.text)
+        elif resp.status_code == 200:
+            return OAuth2FlowNoRedirectResult(
+                result['access_token'],
+                result['refresh_token'],
+                result.get('expires_in', None)
+            )
+        else:
+            raise AuthError(self.request_id)
+
+    def jwt_user_login(self, user_id, kid, private_key, expiration_time_seconds=60):
+        if user_id is None or kid is None or private_key is None:
+            raise AuthError(self.request_id)
+        jti = "".join(random.sample('abcdefghijklmnopqrstuvwxyz!@#$%^&*1234567890', 16)).replace(' ', '')
+        m = hashlib.md5()
+        m.update(jti.encode("utf-8"))
+        jti_md5 = m.hexdigest()
+        payload = {
+            "yifangyun_sub_type": "user",
+            "sub": user_id,
+            "exp": int(time.time()) + expiration_time_seconds,
+            "iat": int(time.time()),
+            "jti": jti_md5,
+        }
+        compactJws = jwt.encode(payload, key=private_key, headers={'kid': kid}, algorithm='RS256')
+
+        url = self.build_url('/oauth/token')
+        params = {
+            'grant_type': 'jwt',
+            'assertion': compactJws
+        }
+
+        resp = self.requests_session.post(url, data=params, auth=HTTPBasicAuth(self.client_id, self.client_secret))
+        result = resp.json()
+
+        if resp.status_code >= 500:
+            raise InternalServerError(self.request_id, resp.status_code, resp.text)
+        elif resp.status_code == 400:
+            raise BadInputError(self.request_id, resp.status_code, resp.text)
+        elif resp.status_code == 200:
+            return OAuth2FlowNoRedirectResult(
+                result['access_token'],
+                result['refresh_token'],
+                result.get('expires_in', None)
+            )
+        else:
+            raise AuthError(self.request_id)
+
+    def jwt_enterprise_login(self, enterprise_id, kid, private_key, expiration_time_seconds=60):
+        if enterprise_id is None or kid is None or private_key is None:
+            raise AuthError(self.request_id)
+        jti = "".join(random.sample('abcdefghijklmnopqrstuvwxyz!@#$%^&*1234567890', 16)).replace(' ', '')
+        m = hashlib.md5()
+        m.update(jti.encode("utf-8"))
+        jti_md5 = m.hexdigest()
+        payload = {
+            "yifangyun_sub_type": "enterprise",
+            "sub": enterprise_id,
+            "exp": int(time.time()) + expiration_time_seconds,
+            "iat": int(time.time()),
+            "jti": jti_md5,
+        }
+        compactJws = jwt.encode(payload, key=private_key, headers={'kid': kid}, algorithm='RS256')
+
+        url = self.build_url('/oauth/token')
+        params = {
+            'grant_type': 'jwt',
+            'assertion': compactJws
+        }
+
         resp = self.requests_session.post(url, data=params, auth=HTTPBasicAuth(self.client_id, self.client_secret))
         result = resp.json()
 
@@ -183,11 +263,3 @@ class FangcloudOAuth2FlowBase(object):
             return "%s?%s" % (target_path, query_string)
         else:
             return "%s" % target_path
-
-
-
-
-
-
-
-

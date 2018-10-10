@@ -23,7 +23,8 @@ install_requires = [
     'urllib3',
     'requests>=2.5.1,!=2.6.1',
     'six>=1.3.0',
-    'requests_toolbelt>=0.7.0'
+    'requests_toolbelt>=0.7.0',
+    'jwt>=1.6.4'
 ]
 
 tests_require = [
@@ -38,12 +39,12 @@ setup_requires = [
 
 setup(
         name='fangcloud',
-        version='2.2.3',
+        version='2.2.4',
         description='Official YiFangYun SDK for Open Platform',
         author='YiFangYun',
         author_email='linrenjun@yifangyun.com',
-        maintainer='linrenjun',
-        maintainer_email='lrenjundk@foxmail.com',
+        maintainer='xiangyangyang',
+        maintainer_email='xiangyangyang@yifangyun.com',
         url='https://www.yifangyun.com',
         install_requires=install_requires,
         tests_require=tests_require,

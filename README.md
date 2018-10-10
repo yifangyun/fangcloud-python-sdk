@@ -32,6 +32,8 @@
 
 对接的Demo位于example/web-demo中，运行其中的main.py即可启动web服务。在浏览器中输入 "[http://localhost:8088](http://localhost:8088)" 进入demo流程。在使用之前请确保本地8088端口未被占用。web-demo使用tornado框架进行搭建，需在使用之前预先安装好。
 
+## 授权码模式
+
 ### 获取授权链接
 
 授权的第一步是获取授权链接，示例如下代码实现：
@@ -110,11 +112,32 @@ class AuthFinishHandler(BasicHandler):
         self.write(str(result))
 ```
 
+## JWT模式
+
+### 获取OAuth Token / Refresh Token
+```python
+from fangcloud.oauth import FangcloudOAuth2FlowBase
+from fangcloud.yifangyun import YfyInit
+YfyInit.init_system("YOUR_CLIENT_ID", "YOUR_CLIENT_SECRET")
+oauth = FangcloudOAuth2FlowBase()
+private_key = open("YOUR_PRIVATE_KEY_PATH", "r").read()
+
+# 获取企业token
+jwt_enterprise_login = oauth.jwt_enterprise_login("YOUR_ENTERPRISE_ID", "KID", private_key)
+enterprise_access_token, enterprise_refresh_token = jwt_enterprise_login.access_token, jwt_enterprise_login.refresh_token
+
+# 获取用户token
+jwt_user_login = oauth.jwt_user_login("YOUR_USER_ID", "KID", private_key)
+user_access_token, user_refresh_token = jwt_user_login.access_token, jwt_user_login.refresh_token
+
+```
+
+
 ## 使用方法
 
-亿方云提供开放平台V1版本的API，详细说明文档请参阅[API文档](https://open.fangcloud.com/wiki/#接口列表)。
+亿方云提供开放平台V2版本的API，详细说明文档请参阅[API文档](https://open.fangcloud.com/wiki/v2/#jie-kou-ren-zheng)。
 
-一旦获取得到OAuth Token和Refresh Tokken就可以正常调用亿方云开放平台的API，首先需要公国SDK提供的工厂类方法，获取一个亿方云的client。同样，不要忘记先做init_system初始化。
+一旦获取得到OAuth Token和Refresh Token就可以正常调用亿方云开放平台的API，首先需要SDK提供的工厂类方法，获取一个亿方云的client。同样，不要忘记先做init_system初始化。
 
 ```python
 from fangcloud.yifangyun import YfyClientFactory
