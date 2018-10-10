@@ -24,7 +24,8 @@ install_requires = [
     'requests>=2.5.1,!=2.6.1',
     'six>=1.3.0',
     'requests_toolbelt>=0.7.0',
-    'pyjwt>=1.6.4'
+    'pyjwt>=1.6.4',
+    'cryptography>=2.3.1'
 ]
 
 tests_require = [
@@ -39,7 +40,7 @@ setup_requires = [
 
 setup(
         name='fangcloud',
-        version='2.2.5',
+        version='2.2.7',
         description='Official YiFangYun SDK for Open Platform',
         author='YiFangYun',
         author_email='linrenjun@yifangyun.com',
